@@ -1,0 +1,15 @@
+# Backend
+node_modules/
+.env
+uploads/
+*.log
+npm-debug.log*
+.DS_Store
+
+# Frontend  
+frontend/node_modules/
+frontend/build/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
