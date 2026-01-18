@@ -117,6 +117,125 @@ const Profile = () => {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                       />
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Secteur d'activité
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.mentorInfo.industry || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            mentorInfo: { ...formData.mentorInfo, industry: e.target.value }
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        placeholder="Ex: Technologie, Finance, Santé..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Biographie
+                      </label>
+                      <textarea
+                        value={formData.mentorInfo.bio || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            mentorInfo: { ...formData.mentorInfo, bio: e.target.value }
+                          })
+                        }
+                        rows="4"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        placeholder="Parlez de votre parcours et de votre expérience..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Domaines d'expertise (séparés par des virgules)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.mentorInfo.expertise?.join(', ') || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            mentorInfo: {
+                              ...formData.mentorInfo,
+                              expertise: e.target.value.split(',').map(s => s.trim()).filter(s => s)
+                            }
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        placeholder="Ex: JavaScript, Management, Marketing..."
+                      />
+                    </div>
+                  </>
+                )}
+
+                {isStudent && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Niveau d'études
+                      </label>
+                      <select
+                        value={formData.studentInfo.educationLevel || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            studentInfo: { ...formData.studentInfo, educationLevel: e.target.value }
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      >
+                        <option value="">Sélectionnez un niveau</option>
+                        <option value="Secondaire">Secondaire</option>
+                        <option value="Cégep">Cégep</option>
+                        <option value="Université - 1er cycle">Université - 1er cycle</option>
+                        <option value="Université - 2e cycle">Université - 2e cycle</option>
+                        <option value="Université - 3e cycle">Université - 3e cycle</option>
+                        <option value="Autre">Autre</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Centres d'intérêt (séparés par des virgules)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.studentInfo.interests?.join(', ') || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            studentInfo: {
+                              ...formData.studentInfo,
+                              interests: e.target.value.split(',').map(s => s.trim()).filter(s => s)
+                            }
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        placeholder="Ex: Programmation, Design, Entrepreneuriat..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Objectifs
+                      </label>
+                      <textarea
+                        value={formData.studentInfo.goals || ''}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            studentInfo: { ...formData.studentInfo, goals: e.target.value }
+                          })
+                        }
+                        rows="4"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        placeholder="Décrivez vos objectifs professionnels et académiques..."
+                      />
+                    </div>
                   </>
                 )}
 
@@ -145,9 +264,28 @@ const Profile = () => {
                       <p className="mt-1">{user?.mentorInfo?.company || 'Non renseignée'}</p>
                     </div>
                     <div>
+                      <h3 className="text-sm font-medium text-gray-500">Secteur d'activité</h3>
+                      <p className="mt-1">{user?.mentorInfo?.industry || 'Non renseigné'}</p>
+                    </div>
+                    <div>
                       <h3 className="text-sm font-medium text-gray-500">Biographie</h3>
                       <p className="mt-1">{user?.mentorInfo?.bio || 'Non renseignée'}</p>
                     </div>
+                    {user?.mentorInfo?.expertise && user.mentorInfo.expertise.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500 mb-2">Domaines d'expertise</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {user.mentorInfo.expertise.map((exp, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm"
+                            >
+                              {exp}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
 
@@ -159,6 +297,21 @@ const Profile = () => {
                         {user?.studentInfo?.educationLevel || 'Non renseigné'}
                       </p>
                     </div>
+                    {user?.studentInfo?.interests && user.studentInfo.interests.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500 mb-2">Centres d'intérêt</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {user.studentInfo.interests.map((interest, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
+                            >
+                              {interest}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Objectifs</h3>
                       <p className="mt-1">{user?.studentInfo?.goals || 'Non renseignés'}</p>

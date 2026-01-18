@@ -12,6 +12,19 @@ exports.getUserProfile = async (req, res) => {
       return res.status(404).json({ message: 'Utilisateur non trouvé' });
     }
     
+    // Nettoyer les pendingConnections qui sont déjà dans connections
+    if (user.role === 'mentor' && user.pendingConnections && user.pendingConnections.length > 0) {
+      const originalLength = user.pendingConnections.length;
+      user.pendingConnections = user.pendingConnections.filter(
+        pendingId => !user.connections.some(connId => connId.toString() === pendingId.toString())
+      );
+      
+      // Sauvegarder si des changements ont été faits
+      if (user.pendingConnections.length !== originalLength) {
+        await user.save();
+      }
+    }
+    
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la récupération du profil', error: error.message });
@@ -151,12 +164,46 @@ exports.requestConnection = async (req, res) => {
 // @access  Private (Mentor only)
 exports.acceptConnection = async (req, res) => {
   try {
+    console.log('=== DÉBUT ACCEPTATION CONNEXION ===');
+    console.log('Mentor ID:', req.user._id);
+    console.log('Student ID:', req.params.studentId);
+    
     const mentor = await User.findById(req.user._id);
     const student = await User.findById(req.params.studentId);
 
-    if (!student || student.role !== 'student') {
+    console.log('Mentor trouvé:', mentor ? 'Oui' : 'Non');
+    console.log('Student trouvé:', student ? 'Oui' : 'Non');
+    console.log('Student role:', student?.role);
+
+    if (!student) {
+      console.log('ERREUR: Étudiant non trouvé');
       return res.status(404).json({ message: 'Étudiant non trouvé' });
     }
+    
+    if (student.role !== 'student') {
+      console.log('ERREUR: Ce n\'est pas un étudiant, role:', student.role);
+      return res.status(404).json({ message: 'Cet utilisateur n\'est pas un étudiant' });
+    }
+
+    // Vérifier si déjà connecté
+    const alreadyConnected = mentor.connections.some(
+      connId => connId.toString() === student._id.toString()
+    );
+    console.log('Déjà connecté?', alreadyConnected);
+    
+    if (alreadyConnected) {
+      console.log('ATTENTION: Déjà connecté, nettoyage de pendingConnections');
+      // Retirer de pendingConnections si présent
+      mentor.pendingConnections = mentor.pendingConnections.filter(
+        id => id.toString() !== student._id.toString()
+      );
+      await mentor.save();
+      return res.status(400).json({ message: 'Vous êtes déjà connecté avec cet étudiant' });
+    }
+
+    console.log('Avant - Mentor connections:', mentor.connections.length);
+    console.log('Avant - Mentor pending:', mentor.pendingConnections.length);
+    console.log('Avant - Student connections:', student.connections.length);
 
     // Retirer de la liste d'attente
     mentor.pendingConnections = mentor.pendingConnections.filter(
@@ -175,6 +222,10 @@ exports.acceptConnection = async (req, res) => {
     await mentor.save();
     await student.save();
 
+    console.log('Après - Mentor connections:', mentor.connections.length);
+    console.log('Après - Mentor pending:', mentor.pendingConnections.length);
+    console.log('Après - Student connections:', student.connections.length);
+
     // Créer une notification pour l'étudiant
     await Notification.create({
       userId: student._id,
@@ -185,8 +236,12 @@ exports.acceptConnection = async (req, res) => {
       onModel: 'User'
     });
 
+    console.log('=== SUCCÈS ACCEPTATION ===');
     res.json({ message: 'Connexion acceptée avec succès' });
   } catch (error) {
+    console.error('=== ERREUR ACCEPTATION ===');
+    console.error('Message:', error.message);
+    console.error('Stack:', error.stack);
     res.status(500).json({ message: 'Erreur lors de l\'acceptation de la connexion', error: error.message });
   }
 };
