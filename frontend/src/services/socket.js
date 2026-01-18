@@ -89,6 +89,49 @@ class SocketService {
     }
   }
 
+  // Méthodes pour les appels vidéo
+  callUser(data) {
+    if (this.socket) {
+      this.socket.emit('call-user', data);
+    }
+  }
+
+  acceptCall(data) {
+    if (this.socket) {
+      this.socket.emit('accept-call', data);
+    }
+  }
+
+  rejectCall(data) {
+    if (this.socket) {
+      this.socket.emit('reject-call', data);
+    }
+  }
+
+  endCall(data) {
+    if (this.socket) {
+      this.socket.emit('end-call', data);
+    }
+  }
+
+  sendIceCandidate(data) {
+    if (this.socket) {
+      this.socket.emit('ice-candidate', data);
+    }
+  }
+
+  sendAnswer(data) {
+    if (this.socket) {
+      this.socket.emit('answer', data);
+    }
+  }
+
+  onIncomingCall(callback) {
+    if (this.socket) {
+      this.socket.on('incoming-call', callback);
+    }
+  }
+
   off(eventName) {
     if (this.socket) {
       this.socket.off(eventName);

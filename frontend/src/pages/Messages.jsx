@@ -4,6 +4,7 @@ import { messagesAPI, usersAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
+import VideoCallModal from '../components/VideoCall/VideoCallModal';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -15,6 +16,10 @@ const Messages = () => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
+  
+  // État pour les appels vidéo
+  const [isCallModalOpen, setIsCallModalOpen] = useState(false);
+  const [incomingCall, setIncomingCall] = useState(null);
 
   // Auto-scroll vers le bas quand de nouveaux messages arrivent
   const scrollToBottom = () => {
@@ -24,6 +29,18 @@ const Messages = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Écouter les appels entrants
+  useEffect(() => {
+    socket.onIncomingCall((data) => {
+      setIncomingCall(data);
+      setIsCallModalOpen(true);
+    });
+
+    return () => {
+      socket.off('incoming-call');
+    };
+  }, [socket]);
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -130,6 +147,17 @@ const Messages = () => {
     }
   };
 
+  const startCall = () => {
+    if (selectedConversation) {
+      setIsCallModalOpen(true);
+    }
+  };
+
+  const closeCallModal = () => {
+    setIsCallModalOpen(false);
+    setIncomingCall(null);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -183,15 +211,28 @@ const Messages = () => {
       <div className="flex-1 flex flex-col">
         {selectedConversation ? (
           <>
-            <div className="p-4 bg-white border-b">
-              <h2 className="font-bold text-lg">
-                {selectedConversation.user.firstName} {selectedConversation.user.lastName}
-              </h2>
-              <p className="text-sm text-gray-500">
-                {selectedConversation.user.role === 'mentor' 
-                  ? selectedConversation.user.mentorInfo?.currentJob 
-                  : selectedConversation.user.studentInfo?.educationLevel}
-              </p>
+            <div className="p-4 bg-white border-b flex items-center justify-between">
+              <div>
+                <h2 className="font-bold text-lg">
+                  {selectedConversation.user.firstName} {selectedConversation.user.lastName}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {selectedConversation.user.role === 'mentor' 
+                    ? selectedConversation.user.mentorInfo?.currentJob 
+                    : selectedConversation.user.studentInfo?.educationLevel}
+                </p>
+              </div>
+              
+              {/* Bouton d'appel vidéo */}
+              <button
+                onClick={startCall}
+                className="p-3 rounded-full bg-indigo-100 hover:bg-indigo-200 text-indigo-600 transition-colors"
+                title="Démarrer un appel vidéo"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
@@ -265,6 +306,18 @@ const Messages = () => {
           </div>
         )}
       </div>
+
+      {/* Modal d'appel vidéo */}
+      {isCallModalOpen && selectedConversation && (
+        <VideoCallModal
+          isOpen={isCallModalOpen}
+          onClose={closeCallModal}
+          contactId={incomingCall ? incomingCall.from : selectedConversation.user._id}
+          contactName={incomingCall ? incomingCall.callerName : `${selectedConversation.user.firstName} ${selectedConversation.user.lastName}`}
+          isIncoming={!!incomingCall}
+          callerId={incomingCall?.from}
+        />
+      )}
     </div>
   );
 };

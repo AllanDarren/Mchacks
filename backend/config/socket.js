@@ -33,6 +33,46 @@ const initializeSocket = (io) => {
       });
     });
 
+    // Gestion des appels vidéo WebRTC
+    socket.on('call-user', ({ to, offer }) => {
+      console.log(`Appel de ${socket.id} vers ${to}`);
+      io.to(to).emit('incoming-call', {
+        from: Array.from(connectedUsers.entries()).find(([_, socketId]) => socketId === socket.id)?.[0],
+        offer,
+        callerSocketId: socket.id
+      });
+    });
+
+    socket.on('accept-call', ({ to }) => {
+      console.log(`Appel accepté par ${socket.id}`);
+      io.to(to).emit('call-accepted', {
+        from: Array.from(connectedUsers.entries()).find(([_, socketId]) => socketId === socket.id)?.[0]
+      });
+    });
+
+    socket.on('reject-call', ({ to }) => {
+      console.log(`Appel refusé par ${socket.id}`);
+      io.to(to).emit('call-rejected');
+    });
+
+    socket.on('end-call', ({ to }) => {
+      console.log(`Appel terminé par ${socket.id}`);
+      io.to(to).emit('call-ended');
+    });
+
+    socket.on('ice-candidate', ({ to, candidate }) => {
+      io.to(to).emit('ice-candidate', { candidate });
+    });
+
+    socket.on('offer', ({ to, offer }) => {
+      const fromUserId = Array.from(connectedUsers.entries()).find(([_, socketId]) => socketId === socket.id)?.[0];
+      io.to(to).emit('offer', { offer, from: fromUserId });
+    });
+
+    socket.on('answer', ({ to, answer }) => {
+      io.to(to).emit('answer', { answer });
+    });
+
     // Déconnexion
     socket.on('disconnect', () => {
       let disconnectedUserId;
