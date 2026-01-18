@@ -3,21 +3,33 @@ const router = express.Router();
 const { protect } = require('../middleware/auth');
 const axios = require('axios');
 
-// Créer une room Daily.co temporaire (gratuit, pas besoin d'API key pour les rooms publiques)
+// Créer une room Daily.co temporaire avec l'API
 router.post('/create-room', protect, async (req, res) => {
   try {
     const { contactId } = req.body;
     
-    // Créer une room temporaire via l'API Daily.co (domaine public gratuit)
-    // Pour production, créer un compte Daily.co et utiliser une vraie API key
-    // Pour hackathon: utiliser les rooms publiques avec un nom unique
-    
-    const roomName = `mchacks-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
-    // URL de la room Daily.co publique (pas besoin d'API pour les tests)
-    // Format: https://your-domain.daily.co/roomname
-    // Pour les tests, on utilise un domaine temporaire
-    const roomUrl = `https://${roomName}.daily.co`;
+    // Créer une room temporaire via l'API Daily.co
+    const response = await axios.post(
+      'https://api.daily.co/v1/rooms',
+      {
+        properties: {
+          enable_screenshare: true,
+          enable_chat: true,
+          start_video_off: false,
+          start_audio_off: false,
+          exp: Math.floor(Date.now() / 1000) + 3600 // Expire dans 1 heure
+        }
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${process.env.DAILY_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const roomUrl = response.data.url;
+    const roomName = response.data.name;
     
     console.log('✅ Room Daily.co créée:', roomUrl);
     
@@ -26,8 +38,11 @@ router.post('/create-room', protect, async (req, res) => {
       roomName
     });
   } catch (error) {
-    console.error('❌ Erreur création room:', error);
-    res.status(500).json({ message: 'Erreur lors de la création de la room', error: error.message });
+    console.error('❌ Erreur création room Daily.co:', error.response?.data || error.message);
+    res.status(500).json({ 
+      message: 'Erreur lors de la création de la room', 
+      error: error.response?.data || error.message 
+    });
   }
 });
 
