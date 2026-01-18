@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { messagesAPI, usersAPI, videocallAPI } from '../services/api';
+import { messagesAPI, usersAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
-import DailyVideoCall from '../components/VideoCall/DailyVideoCall';
+import SimpleVideoCall from '../components/VideoCall/SimpleVideoCall';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -17,10 +17,12 @@ const Messages = () => {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
   
-  // État pour les appels vidéo Daily.co
-  const [callRoomUrl, setCallRoomUrl] = useState(null);
-  const [incomingCallRoom, setIncomingCallRoom] = useState(null);
-  const [outgoingCall, setOutgoingCall] = useState(false); // Nouveau: pour savoir si on a initié l'appel
+  // État pour les appels vidéo WebRTC
+  const [isInCall, setIsInCall] = useState(false);
+  const [incomingCall, setIncomingCall] = useState(null);
+  const [callContactId, setCallContactId] = useState(null);
+  const [callContactName, setCallContactName] = useState(null);
+  const [isIncomingCall, setIsIncomingCall] = useState(false);
 
   // Auto-scroll vers le bas quand de nouveaux messages arrivent
   const scrollToBottom = () => {
@@ -31,44 +33,31 @@ const Messages = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Écouter les appels entrants via socket
+  // Écouter les appels entrants WebRTC
   useEffect(() => {
     if (!socket.socket) return;
 
     const handleIncomingCall = (data) => {
-      console.log('Appel entrant Daily.co reçu:', data);
+      console.log('📞 Appel WebRTC entrant:', data);
       
-      // Ne pas afficher la notification si on est déjà en appel
-      if (callRoomUrl) {
-        console.log('Déjà en appel, invitation ignorée');
+      // Ne pas afficher si déjà en appel
+      if (isInCall) {
+        console.log('Déjà en appel, ignoré');
         return;
       }
       
-      // Ne pas traiter notre propre invitation (quand on est l'appelant)
-      if (outgoingCall) {
-        console.log('C\'est notre propre appel, ignoré');
-        return;
-      }
-      
-      // Ne pas écraser une invitation déjà affichée
-      setIncomingCallRoom((prev) => {
-        if (prev) {
-          console.log('Invitation déjà en cours, ignorée');
-          return prev;
-        }
-        return {
-          roomUrl: data.roomUrl,
-          callerName: data.callerName || 'Utilisateur'
-        };
+      setIncomingCall({
+        from: data.from,
+        callerName: data.callerName || 'Utilisateur'
       });
     };
 
-    socket.socket.on('video-call-invite', handleIncomingCall);
+    socket.socket.on('webrtc-offer', handleIncomingCall);
 
     return () => {
-      socket.socket.off('video-call-invite', handleIncomingCall);
+      socket.socket.off('webrtc-offer', handleIncomingCall);
     };
-  }, [socket, callRoomUrl, outgoingCall]);
+  }, [socket, isInCall]);
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -175,56 +164,39 @@ const Messages = () => {
     }
   };
 
-  const startCall = async () => {
+  const startCall = () => {
     if (!selectedConversation) return;
     
-    try {
-      console.log('Création d\'une salle Daily.co pour:', selectedConversation.user._id);
-      
-      // Marquer qu'on initie un appel sortant
-      setOutgoingCall(true);
-      
-      // Créer une salle sur le serveur
-      const response = await videocallAPI.createRoom(selectedConversation.user._id);
-      const { roomUrl } = response.data;
-      
-      console.log('Salle créée:', roomUrl);
-      
-      // Ouvrir la salle pour moi
-      setCallRoomUrl(roomUrl);
-      
-      // Envoyer l'invitation via socket
-      socket.socket.emit('video-call-invite', {
-        to: selectedConversation.user._id,
-        roomUrl,
-        callerName: `${user.firstName} ${user.lastName}`
-      });
-      
-      console.log('Invitation envoyée via socket');
-    } catch (error) {
-      console.error('Erreur lors de la création de la salle:', error);
-      alert('Impossible de démarrer l\'appel vidéo');
-      setOutgoingCall(false);
-    }
+    console.log('🎥 Démarrage appel WebRTC vers:', selectedConversation.user._id);
+    
+    setIsInCall(true);
+    setCallContactId(selectedConversation.user._id);
+    setCallContactName(`${selectedConversation.user.firstName} ${selectedConversation.user.lastName}`);
+    setIsIncomingCall(false);
   };
 
   const acceptIncomingCall = () => {
-    console.log('Acceptation de l\'appel:', incomingCallRoom);
-    if (incomingCallRoom) {
-      setCallRoomUrl(incomingCallRoom.roomUrl);
-      setIncomingCallRoom(null);
+    console.log('✅ Acceptation de l\'appel de:', incomingCall?.callerName);
+    if (incomingCall) {
+      setIsInCall(true);
+      setCallContactId(incomingCall.from);
+      setCallContactName(incomingCall.callerName);
+      setIsIncomingCall(true);
+      setIncomingCall(null);
     }
   };
 
   const rejectIncomingCall = () => {
-    console.log('Refus de l\'appel');
-    setIncomingCallRoom(null);
+    console.log('❌ Refus de l\'appel');
+    setIncomingCall(null);
   };
 
   const closeCall = () => {
-    console.log('Fermeture de l\'appel vidéo');
-    setCallRoomUrl(null);
-    setOutgoingCall(false); // Réinitialiser le flag d'appel sortant
+    console.log('📞 Fermeture de l\'appel vidéo');
+    setIsInCall(false);
+    setCallContactId(null);
+    setCallContactName(null);
+    setIsIncomingCall(false);
   };
 
   if (loading) {
@@ -376,16 +348,18 @@ const Messages = () => {
         )}
       </div>
 
-      {/* Daily.co Video Call */}
-      {callRoomUrl && (
-        <DailyVideoCall
-          roomUrl={callRoomUrl}
+      {/* Composant d'appel vidéo WebRTC */}
+      {isInCall && callContactId && (
+        <SimpleVideoCall
+          contactId={callContactId}
+          contactName={callContactName}
           onLeave={closeCall}
+          isIncoming={isIncomingCall}
         />
       )}
 
       {/* Notification d'appel entrant */}
-      {incomingCallRoom && (
+      {incomingCall && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
             <div className="text-center">
@@ -395,7 +369,7 @@ const Messages = () => {
                 </svg>
               </div>
               <h3 className="text-lg font-semibold mb-2">Appel vidéo entrant</h3>
-              <p className="text-gray-600 mb-6">{incomingCallRoom.callerName} vous appelle</p>
+              <p className="text-gray-600 mb-6">{incomingCall.callerName} vous appelle</p>
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={rejectIncomingCall}

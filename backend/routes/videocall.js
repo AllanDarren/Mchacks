@@ -9,19 +9,21 @@ router.post('/create-room', protect, async (req, res) => {
     const { contactId } = req.body;
     
     // Générer un ID unique pour la room
-    const roomName = `call-${uuidv4()}`;
+    const roomName = `mchacks-${uuidv4()}`;
     
-    // URL de la room (sans API - utilise juste une URL unique)
-    const roomUrl = `https://mentorconnect.daily.co/${roomName}`;
+    // Utiliser le domaine public Daily.co (gratuit, pas besoin d'API key)
+    // Format: https://username.daily.co/roomname
+    // Pour tester sans compte, on peut utiliser: https://daily.co/roomname
+    const roomUrl = `https://daily.co/${roomName}`;
     
-    // Tu peux aussi créer via l'API Daily.co si tu veux plus de contrôle
-    // Pour l'instant, on utilise juste des URLs uniques
+    console.log('Room créée:', roomUrl);
     
     res.json({
       roomUrl,
       roomName
     });
   } catch (error) {
+    console.error('Erreur création room:', error);
     res.status(500).json({ message: 'Erreur lors de la création de la room', error: error.message });
   }
 });
