@@ -33,37 +33,13 @@ const initializeSocket = (io) => {
       });
     });
 
-    // WebRTC - Offre d'appel vidéo
-    socket.on('webrtc-offer', ({ to, offer, callerName }) => {
-      const callerId = Array.from(connectedUsers.entries()).find(([_, socketId]) => socketId === socket.id)?.[0];
-      console.log(`📞 Offre WebRTC de ${callerName} (${callerId}) vers ${to}`);
-      io.to(to).emit('webrtc-offer', {
-        from: callerId,
-        offer: offer,
+    // Jitsi - Invitation d'appel vidéo
+    socket.on('jitsi-call-invite', ({ to, roomName, callerName }) => {
+      console.log(`📞 Invitation Jitsi de ${callerName} vers ${to} - Room: ${roomName}`);
+      io.to(to).emit('jitsi-call-invite', {
+        roomName: roomName,
         callerName: callerName
       });
-    });
-
-    // WebRTC - Réponse à l'appel
-    socket.on('webrtc-answer', ({ to, answer }) => {
-      console.log(`📞 Réponse WebRTC vers ${to}`);
-      io.to(to).emit('webrtc-answer', {
-        answer: answer
-      });
-    });
-
-    // WebRTC - Candidat ICE
-    socket.on('ice-candidate', ({ to, candidate }) => {
-      console.log(`🧊 ICE candidate vers ${to}`);
-      io.to(to).emit('ice-candidate', {
-        candidate: candidate
-      });
-    });
-
-    // Fin d'appel
-    socket.on('end-call', ({ to }) => {
-      console.log(`📞 Fin d'appel vers ${to}`);
-      io.to(to).emit('call-ended');
     });
 
     socket.on('accept-call', ({ to }) => {

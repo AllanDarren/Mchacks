@@ -4,7 +4,7 @@ import { messagesAPI, usersAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
-import SimpleVideoCall from '../components/VideoCall/SimpleVideoCall';
+import JitsiVideoCall from '../components/VideoCall/JitsiVideoCall';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -17,13 +17,9 @@ const Messages = () => {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
   
-  // État pour les appels vidéo WebRTC
-  const [isInCall, setIsInCall] = useState(false);
-  const [incomingCall, setIncomingCall] = useState(null); // Stocke {from, callerName, offer}
-  const [callContactId, setCallContactId] = useState(null);
-  const [callContactName, setCallContactName] = useState(null);
-  const [isIncomingCall, setIsIncomingCall] = useState(false);
-  const [pendingOffer, setPendingOffer] = useState(null); // Nouvelle: stocke l'offre WebRTC
+  // État pour les appels vidéo Jitsi
+  const [callRoomName, setCallRoomName] = useState(null);
+  const [incomingCall, setIncomingCall] = useState(null); // {callerName, roomName}
 
   // Auto-scroll vers le bas quand de nouveaux messages arrivent
   const scrollToBottom = () => {
@@ -34,33 +30,31 @@ const Messages = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Écouter les appels entrants WebRTC
+  // Écouter les appels entrants Jitsi
   useEffect(() => {
     if (!socket.socket) return;
 
     const handleIncomingCall = (data) => {
-      console.log('📞 Appel WebRTC entrant:', data);
+      console.log('📞 Appel Jitsi entrant:', data);
       
       // Ne pas afficher si déjà en appel
-      if (isInCall) {
+      if (callRoomName) {
         console.log('Déjà en appel, ignoré');
         return;
       }
       
-      // Stocker l'offre ET les infos de l'appelant
       setIncomingCall({
-        from: data.from,
-        callerName: data.callerName || 'Utilisateur'
+        callerName: data.callerName || 'Utilisateur',
+        roomName: data.roomName
       });
-      setPendingOffer(data.offer); // Sauvegarder l'offre WebRTC
     };
 
-    socket.socket.on('webrtc-offer', handleIncomingCall);
+    socket.socket.on('jitsi-call-invite', handleIncomingCall);
 
     return () => {
-      socket.socket.off('webrtc-offer', handleIncomingCall);
+      socket.socket.off('jitsi-call-invite', handleIncomingCall);
     };
-  }, [socket, isInCall]);
+  }, [socket, callRoomName]);
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -170,39 +164,40 @@ const Messages = () => {
   const startCall = () => {
     if (!selectedConversation) return;
     
-    console.log('🎥 Démarrage appel WebRTC vers:', selectedConversation.user._id);
+    console.log('🎥 Démarrage appel Jitsi vers:', selectedConversation.user._id);
     
-    setIsInCall(true);
-    setCallContactId(selectedConversation.user._id);
-    setCallContactName(`${selectedConversation.user.firstName} ${selectedConversation.user.lastName}`);
-    setIsIncomingCall(false);
+    // Créer un nom de room unique
+    const roomName = `mchacks-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Rejoindre la room immédiatement
+    setCallRoomName(roomName);
+    
+    // Envoyer l'invitation via socket
+    socket.socket.emit('jitsi-call-invite', {
+      to: selectedConversation.user._id,
+      roomName: roomName,
+      callerName: `${user.firstName} ${user.lastName}`
+    });
+    
+    console.log('📤 Invitation Jitsi envoyée - Room:', roomName);
   };
 
   const acceptIncomingCall = () => {
     console.log('✅ Acceptation de l\'appel de:', incomingCall?.callerName);
     if (incomingCall) {
-      setIsInCall(true);
-      setCallContactId(incomingCall.from);
-      setCallContactName(incomingCall.callerName);
-      setIsIncomingCall(true);
+      setCallRoomName(incomingCall.roomName);
       setIncomingCall(null);
-      // pendingOffer est déjà dans le state, sera passé à SimpleVideoCall
     }
   };
 
   const rejectIncomingCall = () => {
     console.log('❌ Refus de l\'appel');
     setIncomingCall(null);
-    setPendingOffer(null);
   };
 
   const closeCall = () => {
     console.log('📞 Fermeture de l\'appel vidéo');
-    setIsInCall(false);
-    setCallContactId(null);
-    setCallContactName(null);
-    setIsIncomingCall(false);
-    setPendingOffer(null);
+    setCallRoomName(null);
   };
 
   if (loading) {
@@ -354,14 +349,12 @@ const Messages = () => {
         )}
       </div>
 
-      {/* Composant d'appel vidéo WebRTC */}
-      {isInCall && callContactId && (
-        <SimpleVideoCall
-          contactId={callContactId}
-          contactName={callContactName}
+      {/* Composant d'appel vidéo Jitsi */}
+      {callRoomName && (
+        <JitsiVideoCall
+          roomName={callRoomName}
+          displayName={`${user.firstName} ${user.lastName}`}
           onLeave={closeCall}
-          isIncoming={isIncomingCall}
-          initialOffer={pendingOffer}
         />
       )}
 
