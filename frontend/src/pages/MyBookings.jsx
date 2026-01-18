@@ -21,7 +21,7 @@ const MyBookings = () => {
       const response = await api.availabilityAPI.getStudentBookings();
       setBookings(response.data || []);
     } catch (error) {
-      console.error('Erreur lors du chargement des réservations:', error);
+      console.error('Error loading bookings:', error);
     } finally {
       setLoading(false);
     }
@@ -48,10 +48,10 @@ const MyBookings = () => {
       setShowCancelModal(false);
       setSelectedBooking(null);
       loadBookings();
-      alert('Réservation annulée');
+      alert('Appointment cancelled');
     } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de l\'annulation');
+      console.error('Error:', error);
+      alert('Error cancelling appointment');
     }
   };
 
@@ -61,9 +61,9 @@ const MyBookings = () => {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Mes Rendez-vous</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">My Appointments</h2>
 
-        {/* Filtres */}
+        {/* Filters */}
         <div className="flex gap-2">
           {['upcoming', 'past', 'all'].map(f => (
             <button
@@ -76,26 +76,26 @@ const MyBookings = () => {
               }`}
             >
               {f === 'upcoming'
-                ? 'À venir'
+                ? 'Upcoming'
                 : f === 'past'
-                ? 'Passés'
-                : 'Tous'}
+                ? 'Past'
+                : 'All'}
             </button>
           ))}
         </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-8">Chargement...</div>
+        <div className="text-center py-8">Loading...</div>
       ) : filteredBookings.length === 0 ? (
         <div className="bg-gray-50 rounded-lg p-8 text-center">
           <FiCalendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <p className="text-gray-600">
             {filter === 'upcoming'
-              ? 'Aucun rendez-vous à venir'
+              ? 'No upcoming appointments'
               : filter === 'past'
-              ? 'Aucun rendez-vous passé'
-              : 'Aucun rendez-vous'}
+              ? 'No past appointments'
+              : 'No appointments'}
           </p>
         </div>
       ) : (
@@ -144,19 +144,19 @@ const MyBookings = () => {
                       </div>
                     </div>
 
-                    {/* Type de rendez-vous */}
+                    {/* Appointment type */}
                     <div className="flex gap-2 mb-2">
                       {booking.type === 'virtual' ? (
                         <span className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                          <FiVideo size={14} /> Virtuel
+                          <FiVideo size={14} /> Virtual
                         </span>
                       ) : booking.type === 'in-person' ? (
                         <span className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                          <FiMapPin size={14} /> En personne
+                          <FiMapPin size={14} /> In-person
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                          <FiMapPin size={14} /> Hybride
+                          <FiMapPin size={14} /> Hybrid
                         </span>
                       )}
                     </div>
@@ -206,7 +206,7 @@ const MyBookings = () => {
                         className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 hover:underline mt-2 p-2 bg-blue-50 rounded font-medium"
                       >
                         <FiVideo size={14} />
-                        Rejoindre la réunion
+                        Join Meeting
                       </a>
                     )}
 
@@ -229,7 +229,7 @@ const MyBookings = () => {
                         setShowCancelModal(true);
                       }}
                       className="p-2 rounded-lg hover:bg-red-100 text-red-600 transition-colors"
-                      title="Annuler la réservation"
+                      title="Cancel appointment"
                     >
                       <FiX size={20} />
                     </button>
@@ -241,21 +241,21 @@ const MyBookings = () => {
         </div>
       )}
 
-      {/* Modal d'annulation */}
+      {/* Cancel modal */}
       {showCancelModal && selectedBooking && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4">
-              Annuler la réservation?
+              Cancel Appointment?
             </h3>
             <p className="text-gray-600 mb-6">
-              Êtes-vous sûr de vouloir annuler la réservation avec{' '}
+              Are you sure you want to cancel your appointment with{' '}
               <strong>
                 {selectedBooking.mentorId?.firstName} {selectedBooking.mentorId?.lastName}
               </strong>{' '}
-              le{' '}
+              on{' '}
               <strong>
-                {new Date(selectedBooking.startDateTime).toLocaleDateString('fr-FR')}
+                {new Date(selectedBooking.startDateTime).toLocaleDateString('en-US')}
               </strong>
               ?
             </p>
@@ -267,13 +267,13 @@ const MyBookings = () => {
                 }}
                 className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
               >
-                Non, garder
+                No, keep it
               </button>
               <button
                 onClick={handleCancelBooking}
                 className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
               >
-                Oui, annuler
+                Yes, cancel
               </button>
             </div>
           </div>

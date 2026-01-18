@@ -131,7 +131,7 @@ const Profile = () => {
                           })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                        placeholder="Ex: Technologie, Finance, Santé..."
+                        placeholder="Ex: Technology, Finance, Santé..."
                       />
                     </div>
                     <div>

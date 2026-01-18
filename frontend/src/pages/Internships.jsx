@@ -6,25 +6,25 @@ import { useAuth } from '../contexts/AuthContext';
 
 // Hardcoded options for job titles
 const JOB_TITLES = [
-  'Développeur Full Stack',
-  'Développeur Frontend',
-  'Développeur Backend',
-  'Designer UX/UI',
-  'Designer Graphique',
-  'Chef de Projet',
+  'Full Stack Developer',
+  'Frontend Developer',
+  'Backend Developer',
+  'UX/UI Designer',
+  'Graphic Designer',
+  'Project Manager',
   'Product Manager',
   'Data Scientist',
   'Data Analyst',
-  'Marketing Digital',
-  'Chargé de Communication',
-  'Ressources Humaines',
-  'Comptable',
-  'Analyste Financier',
+  'Digital Marketing',
+  'Communications Manager',
+  'Human Resources',
+  'Accountant',
+  'Financial Analyst',
   'Consultant',
-  'Ingénieur Logiciel',
+  'Software Engineer',
   'DevOps Engineer',
-  'Architecte Cloud',
-  'Cybersécurité',
+  'Cloud Architect',
+  'Cybersecurity',
   'Business Analyst'
 ];
 
@@ -152,11 +152,11 @@ const Internships = () => {
     
     try {
       await internshipsAPI.applyToInternship(selectedInternship._id);
-      showToast('Candidature envoyée avec succès!', 'success');
+      showToast('Application sent successfully!', 'success');
       closeModals();
       fetchInternships();
     } catch (error) {
-      showToast(error.response?.data?.message || 'Erreur lors de la candidature', 'error');
+      showToast(error.response?.data?.message || 'Error during application', 'error');
     }
   };
 
@@ -165,7 +165,7 @@ const Internships = () => {
     
     try {
       await internshipsAPI.manageApplication(selectedInternship._id, studentId, newStatus);
-      showToast('Statut mis à jour avec succès!', 'success');
+      showToast('Status updated successfully!', 'success');
       
       // Update the selected internship with new status
       const updatedApplicants = selectedInternship.applicants.map(applicant =>
@@ -235,7 +235,7 @@ const Internships = () => {
       };
       
       await internshipsAPI.createInternship(internshipData);
-      showToast('Offre de stage créée avec succès!', 'success');
+      showToast('Internship offer created successfully!', 'success');
       setShowCreateForm(false);
       setFormData({
         title: '',
@@ -249,7 +249,7 @@ const Internships = () => {
       });
       fetchInternships();
     } catch (error) {
-      showToast(error.response?.data?.message || 'Erreur lors de la création', 'error');
+      showToast(error.response?.data?.message || 'Error during creation', 'error');
     }
   };
 
@@ -264,13 +264,13 @@ const Internships = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Stages d'un jour</h1>
+        <h1 className="text-3xl font-bold text-gray-900">One-Day Internships</h1>
         {user?.role === 'mentor' && (
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
             className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg"
           >
-            {showCreateForm ? 'Annuler' : '+ Créer une offre'}
+            {showCreateForm ? 'Cancel' : '+ Create Offer'}
           </button>
         )}
       </div>
@@ -278,12 +278,12 @@ const Internships = () => {
       {/* Create Internship Form (Mentors Only) */}
       {showCreateForm && user?.role === 'mentor' && (
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-2xl font-bold mb-4">Nouvelle offre de stage</h2>
+          <h2 className="text-2xl font-bold mb-4">New Internship Offer</h2>
           <form onSubmit={handleCreateInternship} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Titre du poste *
+                  Job Title *
                 </label>
                 <div className="relative">
                   <input
@@ -302,7 +302,7 @@ const Internships = () => {
                     onBlur={() => setTimeout(() => setShowTitleDropdown(false), 300)}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="ex: Développeur Full Stack"
+                    placeholder="ex: Full Stack Developer"
                     autoComplete="off"
                   />
                   {showTitleDropdown && titleSuggestions.length > 0 && (
@@ -344,7 +344,7 @@ const Internships = () => {
                     onBlur={() => setTimeout(() => setShowCompanyDropdown(false), 300)}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Nom de l'entreprise"
+                    placeholder="Company name"
                     autoComplete="off"
                   />
                   {showCompanyDropdown && companySuggestions.length > 0 && (
@@ -367,7 +367,7 @@ const Internships = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Secteur *
+                  Industry *
                 </label>
                 <input
                   type="text"
@@ -376,12 +376,12 @@ const Internships = () => {
                   onChange={handleInputChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="ex: Technologie, Finance, Santé"
+                  placeholder="ex: Technology, Finance, Santé"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Localisation *
+                  Location *
                 </label>
                 <input
                   type="text"
@@ -390,12 +390,12 @@ const Internships = () => {
                   onChange={handleInputChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Ville, Pays"
+                  placeholder="City, Country"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Dates disponibles *
+                  Available Dates *
                 </label>
                 <input
                   type="text"
@@ -404,13 +404,13 @@ const Internships = () => {
                   onChange={handleInputChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="ex: 2026-02-15, 2026-02-22"
+                  placeholder="e.g.: 2026-02-15, 2026-02-22"
                 />
-                <p className="text-xs text-gray-500 mt-1">Séparez les dates par des virgules</p>
+                <p className="text-xs text-gray-500 mt-1">Separate dates with commas</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Places disponibles
+                  Available Spots
                 </label>
                 <input
                   type="number"
@@ -433,14 +433,14 @@ const Internships = () => {
                 required
                 rows="4"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Décrivez l'expérience d'observation, les tâches, ce que l'étudiant apprendra..."
+                placeholder="Describe the observation experience, tasks, what the student will learn..."
               />
             </div>
             <button
               type="submit"
               className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg"
             >
-              Créer l'offre
+              Create Offer
             </button>
           </form>
         </div>
@@ -451,7 +451,7 @@ const Internships = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Poste
+              Position
             </label>
             <div className="relative">
               <input
@@ -467,7 +467,7 @@ const Internships = () => {
                   setShowSearchTitleDropdown(true);
                 }}
                 onBlur={() => setTimeout(() => setShowSearchTitleDropdown(false), 300)}
-                placeholder="ex: Développeur, Marketing, Designer..."
+                placeholder="ex: Developer, Marketing, Designer..."
                 className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                 autoComplete="off"
               />
@@ -516,7 +516,7 @@ const Internships = () => {
                   setShowSearchCompanyDropdown(true);
                 }}
                 onBlur={() => setTimeout(() => setShowSearchCompanyDropdown(false), 300)}
-                placeholder="Nom de l'entreprise..."
+                placeholder="Company name..."
                 className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                 autoComplete="off"
               />
@@ -579,7 +579,7 @@ const Internships = () => {
                 onClick={() => openDetailsModal(internship)}
                 className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
               >
-                Postuler
+                Apply
               </button>
             )}
             
@@ -601,7 +601,7 @@ const Internships = () => {
 
         {internships.length === 0 && (
           <div className="col-span-full text-center text-gray-500 py-12">
-            <p className="text-lg">Aucun stage d'un jour disponible pour le moment</p>
+            <p className="text-lg">No one-day internships available at the moment</p>
           </div>
         )}
       </div>
@@ -612,20 +612,20 @@ const Internships = () => {
           <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">Candidatures - {selectedInternship.title}</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Applications - {selectedInternship.title}</h2>
                 <button onClick={closeModals} className="text-gray-400 hover:text-gray-600 text-2xl">
                   ✕
                 </button>
               </div>
               
               <div className="mb-6">
-                <p className="text-gray-600"><strong>Entreprise:</strong> {selectedInternship.company}</p>
-                <p className="text-gray-600"><strong>Localisation:</strong> {selectedInternship.location}</p>
+                <p className="text-gray-600"><strong>Company:</strong> {selectedInternship.company}</p>
+                <p className="text-gray-600"><strong>Location:</strong> {selectedInternship.location}</p>
                 <p className="text-gray-600 mt-2">{selectedInternship.description}</p>
               </div>
 
               <h3 className="text-xl font-bold mb-4">
-                Candidats ({selectedInternship.applicants?.length || 0})
+                Applicants ({selectedInternship.applicants?.length || 0})
               </h3>
 
               {selectedInternship.applicants && selectedInternship.applicants.length > 0 ? (
@@ -645,7 +645,7 @@ const Internships = () => {
                             <p className="text-sm text-gray-600">📚 {applicant.studentId.studentInfo.fieldOfStudy}</p>
                           )}
                           <p className="text-xs text-gray-500 mt-2">
-                            Candidature envoyée le {new Date(applicant.appliedAt).toLocaleDateString('fr-FR')}
+                            Application sent on {new Date(applicant.appliedAt).toLocaleDateString('en-US')}
                           </p>
                         </div>
                         
@@ -659,9 +659,9 @@ const Internships = () => {
                             `
                           }
                           >
-                            <option value="pending">  En attente</option>
-                            <option value="accepted">✓ Accepté</option>
-                            <option value="rejected">✕ Refusé</option>
+                            <option value="pending">⏳ Pending</option>
+                            <option value="accepted">✓ Accepted</option>
+                            <option value="rejected">✕ Rejected</option>
                           </select>
                         </div>
                       </div>
@@ -669,7 +669,7 @@ const Internships = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">Aucune candidature pour le moment</p>
+                <p className="text-gray-500 text-center py-8">No applications yet</p>
               )}
             </div>
           </div>
@@ -718,46 +718,46 @@ const Internships = () => {
               </div>
 
               <div className="mb-6 space-y-4">
-                <h3 className="text-lg font-bold">Questions de candidature</h3>
+                <h3 className="text-lg font-bold">Application Questions</h3>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Pourquoi souhaitez-vous faire ce stage d'observation? *
+                    Why do you want to do this internship? *
                   </label>
                   <textarea
                     value={applicationAnswers.motivation}
                     onChange={(e) => setApplicationAnswers(prev => ({ ...prev, motivation: e.target.value }))}
                     rows="3"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Expliquez vos motivations..."
+                    placeholder="Explain your motivations..."
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Avez-vous del'expérience dans le domaine choisi? *
+                    Do you have experience in the chosen field? *
                   </label>
                   <textarea
                     value={applicationAnswers.availability}
                     onChange={(e) => setApplicationAnswers(prev => ({ ...prev, availability: e.target.value }))}
                     rows="2"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Précisez vos disponibilités..."
+                    placeholder="Specify your availability..."
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Qu'espérez-vous apprendre durant ce stage? *
+                    What do you hope to learn during this internship? *
                   </label>
                   <textarea
                     value={applicationAnswers.expectations}
                     onChange={(e) => setApplicationAnswers(prev => ({ ...prev, expectations: e.target.value }))}
                     rows="3"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Vos attentes et objectifs d'apprentissage..."
+                    placeholder="Your expectations and learning objectives..."
                     required
                   />
                 </div>
@@ -768,14 +768,14 @@ const Internships = () => {
                   onClick={closeModals}
                   className="flex-1 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50"
                 >
-                  Annuler
+                  Cancel
                 </button>
                 <button
                   onClick={applyToInternship}
                   disabled={!applicationAnswers.motivation || !applicationAnswers.availability || !applicationAnswers.expectations}
                   className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
                 >
-                  Envoyer la candidature
+                  Submit Application
                 </button>
               </div>
             </div>

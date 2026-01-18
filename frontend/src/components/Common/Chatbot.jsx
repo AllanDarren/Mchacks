@@ -8,7 +8,7 @@ const Chatbot = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: `Bonjour ${user?.firstName || 'Utilisateur'}! 👋 Je suis l'assistant MentorConnect propulsé par l'IA. Comment puis-je vous aider aujourd'hui?`,
+      text: `Hello ${user?.firstName || 'User'}! 👋 I'm the MentorConnect AI assistant. How can I help you today?`,
       sender: 'bot',
       timestamp: new Date()
     }
@@ -26,10 +26,10 @@ const Chatbot = () => {
   }, [messages]);
 
   const quickActions = [
-    { text: '📚 Comment trouver un mentor?', action: 'find-mentor' },
-    { text: '💼 Comment postuler à un stage?', action: 'apply-internship' },
-    { text: '📅 Comment réserver un rendez-vous?', action: 'book-appointment' },
-    { text: '💬 Comment envoyer un message?', action: 'send-message' }
+    { text: '📚 How to find a mentor?', action: 'find-mentor' },
+    { text: '💼 How to apply for an internship?', action: 'apply-internship' },
+    { text: '📅 How to book an appointment?', action: 'book-appointment' },
+    { text: '💬 How to send a message?', action: 'send-message' }
   ];
 
   const handleSendMessage = async () => {
@@ -76,7 +76,7 @@ const Chatbot = () => {
       // Fallback message on error
       const errorMessage = {
         id: newMessages.length + 1,
-        text: "Désolé, je rencontre un problème technique. 😔\n\nEssayez de reformuler votre question ou contactez le support si le problème persiste.",
+        text: "Sorry, I'm experiencing a technical issue. 😔\n\nTry rephrasing your question or contact support if the problem persists.",
         sender: 'bot',
         timestamp: new Date()
       };

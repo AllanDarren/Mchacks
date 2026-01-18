@@ -16,7 +16,7 @@ const Messages = () => {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll vers le bas quand de nouveaux messages arrivent
+  // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -31,18 +31,18 @@ const Messages = () => {
       setConversations(response.data);
       setLoading(false);
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('Error:', error);
       setLoading(false);
     }
   }, []);
 
   const openNewConversation = useCallback(async (contactId) => {
     try {
-      // Récupérer les infos du contact
+      // Get contact info
       const response = await usersAPI.getProfile(contactId);
       const contact = response.data;
       
-      // Créer un objet conversation
+      // Create conversation object
       const newConv = {
         user: contact,
         lastMessage: { content: '' },
@@ -212,7 +212,7 @@ const Messages = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
                         <p className="text-lg font-medium mb-2">Aucun message</p>
-                        <p className="text-sm">Envoyez le premier message pour commencer la conversation !</p>
+                        <p className="text-sm">Send the first message to start the conversation!</p>
                       </div>
                     </div>
                   ) : (
@@ -278,8 +278,8 @@ const Messages = () => {
                   <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                   </svg>
-                  <p className="text-lg font-medium">Sélectionnez une conversation</p>
-                  <p className="text-sm text-gray-400 mt-1">Choisissez un contact dans la liste</p>
+                  <p className="text-lg font-medium">Select a conversation</p>
+                  <p className="text-sm text-gray-400 mt-1">Choose a contact from the list</p>
                 </div>
               </div>
             )}

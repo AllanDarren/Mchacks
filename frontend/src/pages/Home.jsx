@@ -10,20 +10,20 @@ const Home = () => {
             MentorShip
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Connectez-vous avec des mentors professionnels et explorez votre avenir
+            Connect with professional mentors and explore your future
           </p>
           <div className="flex gap-4 justify-center">
             <Link
               to="/register"
               className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-lg"
             >
-              Commencer
+              Get Started
             </Link>
             <Link
               to="/login"
               className="px-8 py-3 bg-white hover:bg-gray-50 text-indigo-600 font-medium rounded-lg text-lg border-2 border-indigo-600"
             >
-              Se connecter
+              Sign in
             </Link>
           </div>
         </div>
@@ -31,25 +31,25 @@ const Home = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
             <div className="text-4xl mb-4">🎓</div>
-            <h3 className="text-xl font-bold mb-2">Pour les étudiants</h3>
+            <h3 className="text-xl font-bold mb-2">For Students</h3>
             <p className="text-gray-600">
-              Trouvez des mentors dans votre domaine d'intérêt et obtenez des conseils professionnels
+              Find mentors in your field of interest and get professional advice
             </p>
           </div>
 
           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
             <div className="text-4xl mb-4">💼</div>
-            <h3 className="text-xl font-bold mb-2">Pour les mentors</h3>
+            <h3 className="text-xl font-bold mb-2">For Mentors</h3>
             <p className="text-gray-600">
-              Partagez votre expérience et guidez la prochaine génération de professionnels
+              Share your experience and guide the next generation of professionals
             </p>
           </div>
 
           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
             <div className="text-4xl mb-4">🤝</div>
-            <h3 className="text-xl font-bold mb-2">Connexions authentiques</h3>
+            <h3 className="text-xl font-bold mb-2">Authentic Connections</h3>
             <p className="text-gray-600">
-              Messagerie en temps réel, sessions virtuelles et rencontres en personne
+              Real-time messaging, virtual sessions, and in-person meetings
             </p>
           </div>
         </div>

@@ -53,20 +53,20 @@ const Discover = () => {
   const handleConnect = async (mentorId) => {
     try {
       await usersAPI.requestConnection(mentorId);
-      alert('Demande de connexion envoyée!');
-      // Rafraîchir les connexions et mentors
+      alert('Connection request sent!');
+      // Refresh connections and mentors
       await fetchMyConnections();
       await fetchMentors();
     } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de l\'envoi de la demande');
+      console.error('Error:', error);
+      alert('Error sending request');
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">Découvrir des mentors</h1>
-      <p className="text-gray-600 mb-6">Trouvez le mentor idéal selon vos besoins</p>
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">Discover Mentors</h1>
+      <p className="text-gray-600 mb-6">Find the ideal mentor for your needs</p>
 
       {/* Section de filtres améliorée */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -74,7 +74,7 @@ const Discover = () => {
           <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          Filtres de recherche
+          Search Filters
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -95,17 +95,17 @@ const Discover = () => {
           {/* Type de communication */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Type de communication
+              Type of communication
             </label>
             <select
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               value={filters.communicationType}
               onChange={(e) => setFilters({ ...filters, communicationType: e.target.value })}
             >
-              <option value="">Tous les types</option>
-              <option value="messaging">Messagerie</option>
-              <option value="virtual">Rencontre virtuelle</option>
-              <option value="in-person">En personne</option>
+              <option value="">All types</option>
+              <option value="messaging">Messaging</option>
+              <option value="virtual">Virtual Meeting</option>
+              <option value="in-person">In-person</option>
             </select>
           </div>
 
@@ -115,11 +115,11 @@ const Discover = () => {
           {/* Secteur d'activité */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Secteur d'activité
+              Industry
             </label>
             <input
               type="text"
-              placeholder="Ex: Finance, Technologie..."
+              placeholder="Ex: Finance, Technology..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               value={filters.industry}
               onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
@@ -133,7 +133,7 @@ const Discover = () => {
             </label>
             <input
               type="text"
-              placeholder="Ex: Marketing, Développement..."
+              placeholder="Ex: Marketing, App Dev..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               value={filters.expertise}
               onChange={(e) => setFilters({ ...filters, expertise: e.target.value })}
@@ -147,7 +147,7 @@ const Discover = () => {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              Réinitialiser
+              Reset
             </button>
           </div>
         </div>
@@ -155,16 +155,16 @@ const Discover = () => {
         {/* Filtres actifs */}
         {(filters.search || filters.industry || filters.expertise || filters.communicationType) && (
           <div className="mt-4 pt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-600 mb-2">Filtres actifs:</p>
+            <p className="text-sm text-gray-600 mb-2">Active filters:</p>
             <div className="flex flex-wrap gap-2">
               {filters.search && (
                 <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full">
-                  Nom: {filters.search}
+                  Name: {filters.search}
                 </span>
               )}
               {filters.industry && (
                 <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full">
-                  Secteur: {filters.industry}
+                  Industry: {filters.industry}
                 </span>
               )}
               {filters.expertise && (
@@ -174,7 +174,7 @@ const Discover = () => {
               )}
               {filters.communicationType && (
                 <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full">
-                  Type: {filters.communicationType === 'messaging' ? 'Messagerie' : filters.communicationType === 'virtual' ? 'Virtuel' : 'En personne'}
+                  Type: {filters.communicationType === 'messaging' ? 'Messaging' : filters.communicationType === 'virtual' ? 'Virtual' : 'In-person'}
                 </span>
               )}
             </div>
@@ -185,7 +185,7 @@ const Discover = () => {
       {/* Résultats */}
       <div className="mb-4">
         <p className="text-gray-600">
-          {loading ? 'Chargement...' : `${mentors.length} mentor${mentors.length > 1 ? 's' : ''} trouvé${mentors.length > 1 ? 's' : ''}`}
+          {loading ? 'Loading...' : `${mentors.length} mentor${mentors.length > 1 ? 's' : ''} found`}
         </p>
       </div>
 
@@ -198,7 +198,7 @@ const Discover = () => {
           ))}
           {mentors.length === 0 && (
             <div className="col-span-full text-center text-gray-500 py-12">
-              Aucun mentor trouvé avec ces critères
+              No mentors found with these criteria
             </div>
           )}
         </div>

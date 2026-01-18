@@ -77,9 +77,9 @@ const Connections = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Mes Contacts</h1>
+        <h1 className="text-3xl font-bold text-gray-900">My Connections</h1>
         <p className="text-gray-600 mt-2">
-          Vous avez <span className="font-semibold text-indigo-600">{connections.length}</span> contact{connections.length > 1 ? 's' : ''}
+          You have <span className="font-semibold text-indigo-600">{connections.length}</span> connection{connections.length > 1 ? 's' : ''}
         </p>
       </div>
 
@@ -88,15 +88,15 @@ const Connections = () => {
           <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
           </svg>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Aucune connexion pour le moment</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">No connections yet</h2>
           <p className="text-gray-600 mb-6">
-            Allez dans "Découvrir" pour trouver des mentors et envoyer des demandes de connexion !
+            Go to "Discover" to find mentors and send connection requests!
           </p>
           <button
             onClick={() => navigate('/discover')}
             className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg"
           >
-            Découvrir des mentors
+            Discover Mentors
           </button>
         </div>
       ) : (
@@ -123,7 +123,7 @@ const Connections = () => {
                         {connection.firstName} {connection.lastName}
                       </h3>
                       <p className="text-indigo-100 text-sm">
-                        {connection.role === 'mentor' ? ' Mentor' : ' Étudiant'}
+                        {connection.role === 'mentor' ? 'Mentor' : 'Student'}
                       </p>
                     </div>
                   </div>
@@ -160,7 +160,7 @@ const Connections = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
                           <p className="text-sm text-gray-700">
-                            <span className="font-medium">Secteur:</span> {connection.mentorInfo.industry}
+                            <span className="font-medium">Industry:</span> {connection.mentorInfo.industry}
                           </p>
                         </div>
                       )}
@@ -196,7 +196,7 @@ const Connections = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                           </svg>
                           <p className="text-sm text-gray-700">
-                            <span className="font-medium">{connection.mentorInfo.yearsOfExperience} ans</span> d'expérience
+                            <span className="font-medium">{connection.mentorInfo.yearsOfExperience} years</span> of experience
                           </p>
                         </div>
                       )}
@@ -220,11 +220,11 @@ const Connections = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                           </svg>
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-700 mb-1">Préfère:</p>
+                            <p className="text-sm font-medium text-gray-700 mb-1">Prefers:</p>
                             <div className="flex flex-wrap gap-1">
                               {connection.mentorInfo.preferredCommunication.map((comm, idx) => (
                                 <span key={idx} className="text-xs text-gray-600">
-                                  {comm === 'messaging' ? 'Messagerie' : comm === 'virtual' ? 'Virtuel' : 'En personne'}
+                                  {comm === 'messaging' ? 'Messaging' : comm === 'virtual' ? 'Virtual' : 'In-person'}
                                   {idx < connection.mentorInfo.preferredCommunication.length - 1 && ', '}
                                 </span>
                               ))}
@@ -246,7 +246,7 @@ const Connections = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
                           </svg>
                           <p className="text-sm text-gray-700">
-                            <span className="font-medium">Niveau:</span> {connection.studentInfo.educationLevel}
+                            <span className="font-medium">Level:</span> {connection.studentInfo.educationLevel}
                           </p>
                         </div>
                       )}
@@ -258,7 +258,7 @@ const Connections = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                           </svg>
                           <p className="text-sm text-gray-700">
-                            <span className="font-medium">Programme:</span> {connection.studentInfo.program}
+                            <span className="font-medium">Program:</span> {connection.studentInfo.program}
                           </p>
                         </div>
                       )}
@@ -270,7 +270,7 @@ const Connections = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                           <p className="text-sm text-gray-700">
-                            <span className="font-medium">Année:</span> {connection.studentInfo.year}
+                            <span className="font-medium">Year:</span> {connection.studentInfo.year}
                           </p>
                         </div>
                       )}
@@ -294,7 +294,7 @@ const Connections = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                           </svg>
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-700 mb-1">Intérêts:</p>
+                            <p className="text-sm font-medium text-gray-700 mb-1">Interests:</p>
                             <div className="flex flex-wrap gap-1">
                               {connection.studentInfo.interests.slice(0, 3).map((interest, idx) => (
                                 <span key={idx} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">
@@ -331,13 +331,13 @@ const Connections = () => {
                   {/* Dernier message */}
                   {lastMessage ? (
                     <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                      <p className="text-xs text-gray-500 mb-1">Dernier message:</p>
+                      <p className="text-xs text-gray-500 mb-1">Last message:</p>
                       <p className="text-sm text-gray-700 truncate">
                         {lastMessage.content}
                       </p>
                       <p className="text-xs text-gray-400 mt-1">
                         {new Date(lastMessage.timestamp).toLocaleDateString()} 
-                        {' à '} 
+                        {' at '} 
                         {new Date(lastMessage.timestamp).toLocaleTimeString([], { 
                           hour: '2-digit', 
                           minute: '2-digit' 
@@ -347,7 +347,7 @@ const Connections = () => {
                   ) : (
                     <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                       <p className="text-sm text-gray-500 italic">
-                        Aucun message pour le moment - Démarrez une conversation !
+                        No messages yet - Start a conversation!
                       </p>
                     </div>
                   )}
@@ -356,7 +356,7 @@ const Connections = () => {
                   {unreadCount > 0 && (
                     <div className="mb-4 flex items-center gap-2">
                       <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
-                        {unreadCount} message{unreadCount > 1 ? 's' : ''} non lu{unreadCount > 1 ? 's' : ''}
+                        {unreadCount} unread message{unreadCount > 1 ? 's' : ''}
                       </span>
                     </div>
                   )}
@@ -368,14 +368,14 @@ const Connections = () => {
                         onClick={() => navigate(`/book-availability/${connection._id}`)}
                         className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
                       >
-                        <span>Voir les disponibilités</span>
+                        <span>View Availability</span>
                       </button>
                     )}
                     <button
                       onClick={() => handleOpenChat(connection._id)}
                       className={`${connection.role === 'mentor' ? 'flex-1' : 'w-full'} py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2`}
                     >
-                      <span>Envoyer un message</span>
+                      <span>Send Message</span>
                     </button>
                   </div>
                 </div>

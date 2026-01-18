@@ -83,15 +83,15 @@ const Register = () => {
   const nextStep = () => {
     if (step === 1) {
       if (!formData.role) {
-        setError('Veuillez sélectionner un rôle (Étudiant ou Mentor)');
+        setError('Please select a role (Student or Mentor)');
         return;
       }
       if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) {
-        setError('Veuillez remplir tous les champs obligatoires');
+        setError('Please fill in all required fields');
         return;
       }
       if (formData.password.length < 6) {
-        setError('Le mot de passe doit contenir au moins 6 caractères');
+        setError('Password must contain at least 6 characters');
         return;
       }
     }
@@ -104,10 +104,10 @@ const Register = () => {
       <div className="max-w-2xl w-full space-y-8 bg-white p-10 rounded-xl shadow-lg">
         <div>
           <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            Inscription
+            Sign Up
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Créez votre compte - Étape {step} sur 2
+            Create your account - Step {step} of 2
           </p>
         </div>
 
@@ -122,7 +122,7 @@ const Register = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Je suis un(e) *
+                  I am a *
                 </label>
                 <div className="grid grid-cols-2 gap-4">
                   <button
@@ -138,7 +138,7 @@ const Register = () => {
                     }`}
                   >
                     <span className="text-2xl">🎓</span>
-                    <p className="font-medium mt-2">Étudiant</p>
+                    <p className="font-medium mt-2">Student</p>
                   </button>
                   <button
                     type="button"
@@ -161,22 +161,22 @@ const Register = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Prénom *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
                   <input
                     type="text"
                     name="firstName"
-                    placeholder="Votre prénom"
+                    placeholder="Your first name"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                     value={formData.firstName}
                     onChange={handleChange}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nom *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
                   <input
                     type="text"
                     name="lastName"
-                    placeholder="Votre nom"
+                    placeholder="Your last name"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                     value={formData.lastName}
                     onChange={handleChange}
@@ -189,7 +189,7 @@ const Register = () => {
                 <input
                   type="email"
                   name="email"
-                  placeholder="votre@email.com"
+                  placeholder="your@email.com"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   value={formData.email}
                   onChange={handleChange}
@@ -197,26 +197,26 @@ const Register = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
                 <input
                   type="password"
                   name="password"
                   required
-                  placeholder="Au moins 6 caractères"
+                  placeholder="At least 6 characters"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   value={formData.password}
                   onChange={handleChange}
                 />
-                <p className="text-xs text-gray-500 mt-1">Minimum 6 caractères</p>
+                <p className="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Confirmer le mot de passe *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password *</label>
                 <input
                   type="password"
                   name="confirmPassword"
                   required
-                  placeholder="Répétez votre mot de passe"
+                  placeholder="Repeat your password"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -228,7 +228,7 @@ const Register = () => {
                 onClick={nextStep}
                 className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg"
               >
-                Suivant
+                Next
               </button>
             </div>
           )}
@@ -236,7 +236,7 @@ const Register = () => {
           {step === 2 && formData.role === 'student' && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Niveau d'études</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Education Level</label>
                 <select
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   value={formData.studentInfo.educationLevel}
@@ -247,23 +247,23 @@ const Register = () => {
                     })
                   }
                 >
-                  <option value="">Sélectionnez...</option>
-                  <option value="Secondaire">Secondaire</option>
-                  <option value="Cégep">Cégep</option>
-                  <option value="Université - Baccalauréat">Université - Baccalauréat</option>
-                  <option value="Université - Maîtrise">Université - Maîtrise</option>
-                  <option value="Université - Doctorat">Université - Doctorat</option>
+                  <option value="">Select...</option>
+                  <option value="Secondaire">High School</option>
+                  <option value="Cégep">College (CEGEP)</option>
+                  <option value="Université - Baccalauréat">University - Bachelor's</option>
+                  <option value="Université - Maîtrise">University - Master's</option>
+                  <option value="Université - Doctorat">University - Doctorate</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Centres d'intérêt (séparés par des virgules)
+                  Areas of Interest (comma separated)
                 </label>
                 <input
                   type="text"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="ex: Technologie, Marketing, Finance"
+                  placeholder="e.g.: Technology, Marketing, Finance"
                   onChange={(e) => handleArrayInput('interests', e.target.value, 'student')}
                 />
               </div>
@@ -305,7 +305,7 @@ const Register = () => {
           {step === 2 && formData.role === 'mentor' && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Poste actuel</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Current Position</label>
                 <input
                   type="text"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
@@ -320,7 +320,7 @@ const Register = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Entreprise *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Company *</label>
                 <select
                   name="company"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
@@ -334,7 +334,7 @@ const Register = () => {
                   }}
                   required
                 >
-                  <option value="">Sélectionnez une entreprise</option>
+                  <option value="">Select a company</option>
                   <option value="Holoray">Holoray</option>
                   <option value="Athena AI">Athena AI</option>
                   <option value="Gumloop">Gumloop</option>
@@ -384,13 +384,13 @@ const Register = () => {
                   <option value="PepsiCo">PepsiCo</option>
                   <option value="Unilever">Unilever</option>
                   <option value="Morgan Stanley">Morgan Stanley</option>
-                  <option value="Autre">Autre</option>
+                  <option value="Autre">Other</option>
                 </select>
                 {showOtherCompany && (
                   <input
                     type="text"
                     className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Nom de l'entreprise"
+                    placeholder="Company name"
                     value={formData.mentorInfo.company !== 'Autre' ? formData.mentorInfo.company : ''}
                     onChange={e => setFormData({
                       ...formData,
@@ -401,7 +401,7 @@ const Register = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Secteur d'activité</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
                 <input
                   type="text"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
@@ -417,18 +417,18 @@ const Register = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Domaines d'expertise (séparés par des virgules)
+                  Areas of Expertise (comma separated)
                 </label>
                 <input
                   type="text"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="ex: Développement web, Gestion de projet"
+                  placeholder="e.g.: Web Development, Project Management"
                   onChange={(e) => handleArrayInput('expertise', e.target.value, 'mentor')}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Biographie</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Biography</label>
                 <textarea
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   rows="3"
@@ -463,7 +463,7 @@ const Register = () => {
                         });
                       }}
                     />
-                    <span className="ml-2">Messagerie</span>
+                    <span className="ml-2">Messaging</span>
                   </label>
                   <label className="inline-flex items-center">
                     <input
@@ -483,7 +483,7 @@ const Register = () => {
                         });
                       }}
                     />
-                    <span className="ml-2">Rencontre virtuelle</span>
+                    <span className="ml-2">Virtual Meeting</span>
                   </label>
                   <label className="inline-flex items-center">
                     <input
@@ -503,7 +503,7 @@ const Register = () => {
                         });
                       }}
                     />
-                    <span className="ml-2">En personne</span>
+                    <span className="ml-2">In-person</span>
                   </label>
                 </div>
               </div>
@@ -514,14 +514,14 @@ const Register = () => {
                   onClick={() => setStep(1)}
                   className="flex-1 py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg"
                 >
-                  Retour
+                  Back
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
                   className="flex-1 py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg disabled:opacity-50"
                 >
-                  {loading ? 'Inscription...' : 'S\'inscrire'}
+                  {loading ? 'Signing up...' : 'Sign Up'}
                 </button>
               </div>
             </div>
@@ -530,9 +530,9 @@ const Register = () => {
 
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            Déjà un compte ?{' '}
+            Already have an account?{' '}
             <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Se connecter
+              Sign In
             </Link>
           </p>
         </div>

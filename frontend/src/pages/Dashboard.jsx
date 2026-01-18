@@ -48,19 +48,19 @@ const Dashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        Bienvenue, {user?.firstName} !
+        Welcome, {user?.firstName}!
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition" onClick={() => navigate('/connections')}>
-          <h3 className="text-sm font-medium text-gray-500">Connexions acceptées</h3>
+          <h3 className="text-sm font-medium text-gray-500">Accepted Connections</h3>
           <p className="text-3xl font-bold text-indigo-600 mt-2">{connections.length}</p>
-          <p className="text-xs text-gray-500 mt-2">Cliquez pour voir vos contacts</p>
+          <p className="text-xs text-gray-500 mt-2">Click to view your contacts</p>
         </div>
         
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-sm font-medium text-gray-500">
-            {isStudent ? 'Mentors connectés' : 'Étudiants aidés'}
+            {isStudent ? 'Connected Mentors' : 'Students Helped'}
           </h3>
           <p className="text-3xl font-bold text-indigo-600 mt-2">
             {connections.length}
@@ -69,23 +69,23 @@ const Dashboard = () => {
 
         {isMentor && (
           <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition border-2 border-red-200" onClick={() => navigate('/connection-requests')}>
-            <h3 className="text-sm font-medium text-gray-500">Demandes en attente</h3>
+            <h3 className="text-sm font-medium text-gray-500">Pending Requests</h3>
             <p className="text-3xl font-bold text-red-600 mt-2">{pendingRequests.length}</p>
           </div>
         )}
 
         {!isMentor && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500">Profil complété</h3>
+            <h3 className="text-sm font-medium text-gray-500">Profile Completed</h3>
             <p className="text-3xl font-bold text-indigo-600 mt-2">85%</p>
           </div>
         )}
       </div>
 
-      {/* Prochaines sessions */}
+      {/* Upcoming sessions */}
       <div className="bg-white rounded-lg shadow mb-8">
         <div className="p-6 border-b">
-          <h2 className="text-xl font-bold">Prochaines sessions</h2>
+          <h2 className="text-xl font-bold">Upcoming Sessions</h2>
         </div>
         <div className="p-6">
           {appointments.length > 0 ? (
@@ -99,7 +99,7 @@ const Dashboard = () => {
                         : `${apt.studentId.firstName} ${apt.studentId.lastName}`}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      {new Date(apt.scheduledDate).toLocaleDateString()} à{' '}
+                      {new Date(apt.scheduledDate).toLocaleDateString()} at{' '}
                       {new Date(apt.scheduledDate).toLocaleTimeString()}
                     </p>
                   </div>
@@ -108,13 +108,13 @@ const Dashboard = () => {
                       ? 'bg-blue-100 text-blue-800' 
                       : 'bg-green-100 text-green-800'
                   }`}>
-                    {apt.type === 'virtual' ? 'Virtuel' : 'En personne'}
+                    {apt.type === 'virtual' ? 'Virtual' : 'In-person'}
                   </span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-8">Aucune session planifiée</p>
+            <p className="text-gray-500 text-center py-8">No scheduled sessions</p>
           )}
         </div>
       </div>
@@ -140,7 +140,7 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <button className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm">
-                  Voir le profil
+                  View Profile
                 </button>
               </div>
             ))}

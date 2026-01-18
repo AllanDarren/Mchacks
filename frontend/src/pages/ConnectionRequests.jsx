@@ -46,23 +46,23 @@ const ConnectionRequests = () => {
     setAcceptingId(studentId);
     try {
       await usersAPI.acceptConnection(studentId);
-      alert('Connexion acceptée !');
-      // Retirer la demande de la liste
+      alert('Connection accepted!');
+      // Remove request from list
       setRequests(requests.filter(r => r._id !== studentId));
     } catch (error) {
-      console.error('Erreur complète:', error);
-      console.error('Réponse du serveur:', error.response?.data);
-      const errorMessage = error.response?.data?.message || error.message || 'Erreur inconnue';
-      alert(`Erreur lors de l'acceptation: ${errorMessage}`);
+      console.error('Full error:', error);
+      console.error('Server response:', error.response?.data);
+      const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
+      alert(`Error during acceptance: ${errorMessage}`);
     }
     setAcceptingId(null);
   };
 
   const handleReject = async (studentId) => {
     try {
-      // Ici, vous pourriez implémenter une fonction de rejet
+      // Here, you could implement a reject function
       setRequests(requests.filter(r => r._id !== studentId));
-      alert('Demande rejetée');
+      alert('Request rejected');
     } catch (error) {
       console.error('Erreur:', error);
     }
@@ -72,7 +72,7 @@ const ConnectionRequests = () => {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-yellow-50 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-          Cette page est réservée aux mentors
+          This page is reserved for mentors
         </div>
       </div>
     );
@@ -88,12 +88,12 @@ const ConnectionRequests = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Demandes de Connexion</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Connection Requests</h1>
 
       {requests.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-8 text-center">
           <p className="text-gray-500 text-lg">
-            Vous n'avez aucune demande de connexion en attente
+            You have no pending connection requests
           </p>
         </div>
       ) : (
@@ -140,13 +140,13 @@ const ConnectionRequests = () => {
                   disabled={acceptingId === student._id}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition disabled:opacity-50"
                 >
-                  {acceptingId === student._id ? 'Acceptation...' : 'Accepter'}
+                  {acceptingId === student._id ? 'Accepting...' : 'Accept'}
                 </button>
                 <button
                   onClick={() => handleReject(student._id)}
                   className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition"
                 >
-                  Refuser
+                  Reject
                 </button>
               </div>
             </div>
@@ -157,7 +157,7 @@ const ConnectionRequests = () => {
       {requests.length > 0 && (
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-blue-800 text-sm">
-            💡 <strong>{requests.length}</strong> demande(s) de connexion en attente
+            💡 <strong>{requests.length}</strong> pending connection request{requests.length > 1 ? 's' : ''}
           </p>
         </div>
       )}

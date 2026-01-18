@@ -29,7 +29,7 @@ const Navbar = () => {
                 to="/dashboard"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
-                Tableau de bord
+                Dashboard
               </Link>
               <Link
                 to="/connections"
@@ -41,7 +41,7 @@ const Navbar = () => {
                 to="/discover"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
-                Découvrir
+                Discover
               </Link>
               <Link
                 to="/messages"
@@ -53,14 +53,14 @@ const Navbar = () => {
                 to="/internships"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
-                Mini-stages
+                Mini-Internships
               </Link>
               {!isMentor && (
                 <Link
                   to="/my-bookings"
                   className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                 >
-                  Disponibilité
+                  Availability
                 </Link>
               )}
               {isMentor && (
@@ -69,14 +69,14 @@ const Navbar = () => {
                     to="/connection-requests"
                     className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium relative"
                   >
-                    Demandes
+                    Requests
                     <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">!</span>
                   </Link>
                   <Link
                     to="/availability"
                     className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                   >
-                    Disponibilité
+                    Availability
                   </Link>
                 </>
               )}
@@ -97,7 +97,7 @@ const Navbar = () => {
               onClick={handleLogout}
               className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
             >
-              Déconnexion
+              Logout
             </button>
           </div>
         </div>

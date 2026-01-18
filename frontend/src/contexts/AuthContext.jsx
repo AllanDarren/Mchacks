@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Erreur lors de l\'inscription' 
+        error: error.response?.data?.message || 'Error during registration' 
       };
     }
   };
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Erreur lors de la connexion' 
+        error: error.response?.data?.message || 'Error during login' 
       };
     }
   };

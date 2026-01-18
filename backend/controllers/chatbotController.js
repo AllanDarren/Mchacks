@@ -4,36 +4,36 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const systemPrompt = `Tu es l'assistant virtuel de MentorConnect, une plateforme qui connecte des étudiants avec des mentors professionnels.
+const systemPrompt = `You are the virtual assistant for MentorConnect, a platform that connects students with professional mentors.
 
-CONTEXTE DE L'APPLICATION:
-- Les étudiants peuvent trouver des mentors dans la section "Découvrir"
-- Les mentors peuvent créer des offres de stages d'observation d'une journée
-- Les étudiants peuvent postuler aux stages dans la section "Stages"
-- Les mentors peuvent définir leurs disponibilités et les étudiants peuvent réserver des rendez-vous (virtuels ou en personne)
-- Un système de messagerie instantanée permet la communication
-- Les rendez-vous virtuels utilisent Jitsi Meet pour la visioconférence
+APPLICATION CONTEXT:
+- Students can find mentors in the "Discover" section
+- Mentors can create one-day job shadowing internship offers
+- Students can apply to internships in the "Internships" section
+- Mentors can set their availability and students can book appointments (virtual or in-person)
+- An instant messaging system enables communication
+- Virtual appointments use Jitsi Meet for video conferencing
 
-SECTIONS DE L'APPLICATION:
-- Dashboard: Vue d'ensemble avec statistiques
-- Découvrir: Trouver et se connecter avec des mentors
-- Connexions: Gérer les connexions existantes
-- Messages: Messagerie instantanée
-- Stages: Offres de stages d'observation (créer/postuler/gérer)
-- Rendez-vous: Voir et gérer les rendez-vous
-- Profile: Gérer son profil et disponibilités (pour mentors)
+APPLICATION SECTIONS:
+- Dashboard: Overview with statistics
+- Discover: Find and connect with mentors
+- Connections: Manage existing connections
+- Messages: Instant messaging
+- Internships: Internship offers (create/apply/manage)
+- My Appointments: View and manage appointments
+- Profile: Manage profile and availability (for mentors)
 
-RÔLES:
-- Étudiants: Cherchent des mentors, postulent aux stages, réservent des rendez-vous
-- Mentors: Offrent du mentorat, créent des offres de stages, définissent leurs disponibilités
+ROLES:
+- Students: Look for mentors, apply to internships, book appointments
+- Mentors: Offer mentorship, create internship offers, set their availability
 
 INSTRUCTIONS:
-- Réponds en français de manière amicale et professionnelle
-- Donne des instructions claires et étape par étape
-- Utilise des emojis pour rendre les réponses plus engageantes
-- Si la question n'est pas liée à l'application, redirige poliment vers les fonctionnalités de MentorConnect
-- Sois concis mais complet
-- N'invente pas de fonctionnalités qui n'existent pas`;
+- Respond in English in a friendly and professional manner
+- Give clear step-by-step instructions
+- Use emojis to make responses more engaging
+- If the question is not related to the application, politely redirect to MentorConnect features
+- Be concise but complete
+- Don't invent features that don't exist`;
 
 exports.chat = async (req, res) => {
   try {
@@ -41,18 +41,18 @@ exports.chat = async (req, res) => {
     const user = req.user; // From auth middleware
 
     if (!message) {
-      return res.status(400).json({ error: 'Message requis' });
+      return res.status(400).json({ error: 'Message required' });
     }
 
     // Build context with user info
     const userContext = `
-Utilisateur actuel:
-- Nom: ${user.firstName} ${user.lastName}
-- Rôle: ${user.role === 'mentor' ? 'Mentor' : 'Étudiant'}
-${user.role === 'student' ? `- Programme: ${user.studentInfo?.program || 'Non spécifié'}
-- Année: ${user.studentInfo?.year || 'Non spécifié'}` : ''}
-${user.role === 'mentor' ? `- Expertise: ${user.mentorInfo?.expertise?.join(', ') || 'Non spécifié'}
-- Secteur: ${user.mentorInfo?.industry || 'Non spécifié'}` : ''}
+Current User:
+- Name: ${user.firstName} ${user.lastName}
+- Role: ${user.role === 'mentor' ? 'Mentor' : 'Student'}
+${user.role === 'student' ? `- Program: ${user.studentInfo?.program || 'Not specified'}
+- Year: ${user.studentInfo?.year || 'Not specified'}` : ''}
+${user.role === 'mentor' ? `- Expertise: ${user.mentorInfo?.expertise?.join(', ') || 'Not specified'}
+- Industry: ${user.mentorInfo?.industry || 'Not specified'}` : ''}
 `;
 
     // Build conversation history for Gemini
@@ -65,7 +65,7 @@ ${user.role === 'mentor' ? `- Expertise: ${user.mentorInfo?.expertise?.join(', '
     });
     chatHistory.push({
       role: 'model',
-      parts: [{ text: `Compris! Je suis l'assistant MentorConnect et je vais aider ${user.firstName}.` }]
+      parts: [{ text: `Understood! I'm the MentorConnect assistant and I'll help ${user.firstName}.` }]
     });
 
     // Add previous conversation if provided
@@ -135,21 +135,21 @@ ${user.role === 'mentor' ? `- Expertise: ${user.mentorInfo?.expertise?.join(', '
 function getFallbackResponse(message, user) {
   const lowerMessage = message.toLowerCase();
   
-  if (lowerMessage.includes('mentor') && (lowerMessage.includes('trouver') || lowerMessage.includes('chercher'))) {
-    return `Salut ${user.firstName}! 👋\n\nPour trouver un mentor:\n\n1. Va dans la section "Découvrir" 📍\n2. Utilise les filtres pour affiner ta recherche\n3. Clique sur "Se connecter" sur le mentor qui t'intéresse\n4. Attends son acceptation ✅\n\nBonne chance!`;
+  if (lowerMessage.includes('mentor') && (lowerMessage.includes('find') || lowerMessage.includes('search') || lowerMessage.includes('trouver') || lowerMessage.includes('chercher'))) {
+    return `Hi ${user.firstName}! 👋\n\nTo find a mentor:\n\n1. Go to the "Discover" section 📍\n2. Use filters to refine your search\n3. Click "Connect" on the mentor you're interested in\n4. Wait for their acceptance ✅\n\nGood luck!`;
   }
   
-  if (lowerMessage.includes('stage') && (lowerMessage.includes('postuler') || lowerMessage.includes('candidat'))) {
-    return `Pour postuler à un stage:\n\n1. Va dans "Stages" 📋\n2. Cherche les offres qui t'intéressent\n3. Clique sur "Postuler"\n4. Remplis le formulaire\n5. Envoie! ✉️\n\nC'est simple et rapide!`;
+  if (lowerMessage.includes('internship') || lowerMessage.includes('stage') && (lowerMessage.includes('apply') || lowerMessage.includes('postuler') || lowerMessage.includes('candidat'))) {
+    return `To apply to an internship:\n\n1. Go to "Internships" 📋\n2. Search for offers that interest you\n3. Click "Apply"\n4. Fill out the form\n5. Send! ✉️\n\nIt's simple and fast!`;
   }
   
-  if (lowerMessage.includes('rendez-vous') || lowerMessage.includes('réserver') || lowerMessage.includes('rdv')) {
-    return `Pour réserver un rendez-vous:\n\n1. Va dans "Découvrir" ou "Connexions" 🔍\n2. Trouve un mentor avec l'icône 📅\n3. Clique sur "Réserver un rendez-vous"\n4. Choisis date et heure\n5. Confirme! ✓\n\nTu recevras un lien de visio!`;
+  if (lowerMessage.includes('appointment') || lowerMessage.includes('book') || lowerMessage.includes('schedule') || lowerMessage.includes('rendez-vous') || lowerMessage.includes('réserver') || lowerMessage.includes('rdv')) {
+    return `To book an appointment:\n\n1. Go to "Discover" or "Connections" 🔍\n2. Find a mentor with the 📅 icon\n3. Click "Book Appointment"\n4. Choose date and time\n5. Confirm! ✓\n\nYou'll receive a video link!`;
   }
   
-  if (lowerMessage.includes('message') || lowerMessage.includes('discuter') || lowerMessage.includes('chat')) {
-    return `Pour envoyer un message:\n\n1. Va dans "Messages" 💬\n2. Sélectionne ton contact\n3. Tape ton message\n4. Envoie! 📨\n\nLes messages sont instantanés!`;
+  if (lowerMessage.includes('message') || lowerMessage.includes('chat') || lowerMessage.includes('discuter')) {
+    return `To send a message:\n\n1. Go to "Messages" 💬\n2. Select your contact\n3. Type your message\n4. Send! 📨\n\nMessages are instant!`;
   }
   
-  return `Salut ${user.firstName}! 👋\n\nJe peux t'aider avec:\n\n📍 Trouver des mentors\n📋 Postuler aux stages\n📅 Réserver des rendez-vous\n💬 Utiliser la messagerie\n👤 Gérer ton profil\n\nQue veux-tu savoir?`;
+  return `Hi ${user.firstName}! 👋\n\nI can help you with:\n\n📍 Finding mentors\n📋 Applying to internships\n📅 Booking appointments\n💬 Using messaging\n👤 Managing your profile\n\nWhat would you like to know?`;
 }

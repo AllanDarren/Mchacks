@@ -60,7 +60,7 @@ const MentorCard = ({ mentor, onConnect }) => {
             onClick={() => onConnect(mentor._id)}
             className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
           >
-            Se connecter
+            Sign in
           </button>
         </div>
       </div>
