@@ -29,6 +29,7 @@ exports.getInternships = async (req, res) => {
 
     const internships = await Internship.find(query)
       .populate('mentorId', 'firstName lastName profilePicture mentorInfo')
+      .populate('applicants.studentId', 'firstName lastName email studentInfo')
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ createdAt: -1 });
