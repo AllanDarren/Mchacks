@@ -7,7 +7,8 @@ const VideoCallModal = ({
   contactId, 
   contactName,
   isIncoming = false,
-  callerId = null
+  callerId = null,
+  offer = null
 }) => {
   const { socket: socketService } = useSocket();
   const [callStatus, setCallStatus] = useState(isIncoming ? 'incoming' : 'calling');
@@ -18,9 +19,15 @@ const VideoCallModal = ({
   const remoteVideoRef = useRef(null);
   const peerConnectionRef = useRef(null);
   const localStreamRef = useRef(null);
+  const incomingOfferRef = useRef(offer);
 
   // Obtenir le vrai socket depuis socketService
   const socket = socketService.socket;
+
+  // Mettre à jour l'offre si elle change
+  useEffect(() => {
+    incomingOfferRef.current = offer;
+  }, [offer]);
 
   useEffect(() => {
     if (!isOpen || !socket) return;
@@ -76,10 +83,14 @@ const VideoCallModal = ({
       const offer = await peerConnectionRef.current.createOffer();
       await peerConnectionRef.current.setLocalDescription(offer);
 
+      // Émettre l'appel avec l'offre
       socket.emit('call-user', {
         to: contactId,
-        offer: offer
+        offer: offer,
+        callerName: contactName
       });
+
+      console.log('Appel émis vers:', contactId);
 
     } catch (error) {
       console.error('Erreur lors de l\'initialisation de l\'appel:', error);
@@ -88,7 +99,7 @@ const VideoCallModal = ({
     }
   };
 
-  const acceptCall = async () => {
+  const acceptCall = async (offer) => {
     try {
       setCallStatus('connecting');
       
@@ -108,7 +119,20 @@ const VideoCallModal = ({
         peerConnectionRef.current.addTrack(track, stream);
       });
 
-      socket.emit('accept-call', { to: callerId });
+      // Définir l'offre distante
+      await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(offer));
+
+      // Créer et envoyer la réponse
+      const answer = await peerConnectionRef.current.createAnswer();
+      await peerConnectionRef.current.setLocalDescription(answer);
+
+      // Envoyer la réponse
+      socket.emit('answer', { 
+        to: callerId,
+        answer: answer 
+      });
+
+      console.log('Appel accepté, réponse envoyée');
       setCallStatus('connected');
 
     } catch (error) {
@@ -143,47 +167,66 @@ const VideoCallModal = ({
     peerConnectionRef.current.onicecandidate = (event) => {
       if (event.candidate) {
         socket.emit('ice-candidate', {
-          to: contactId,
+          to: callerId || contactId,
           candidate: event.candidate
         });
+        console.log('ICE candidate envoyé');
       }
     };
 
     // Gérer la réception des pistes distantes
     peerConnectionRef.current.ontrack = (event) => {
+      console.log('Piste distante reçue');
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = event.streams[0];
+        setCallStatus('connected');
+      }
+    };
+
+    // Gérer les changements de connexion
+    peerConnectionRef.current.onconnectionstatechange = () => {
+      console.log('État de connexion:', peerConnectionRef.current.connectionState);
+      if (peerConnectionRef.current.connectionState === 'connected') {
         setCallStatus('connected');
       }
     };
   };
 
   const handleCallAccepted = async () => {
+    console.log('Appel accepté par l\'autre utilisateur');
     setCallStatus('connecting');
   };
 
   const handleCallRejected = () => {
+    console.log('Appel refusé');
     alert('Appel refusé');
     onClose();
   };
 
   const handleOffer = async ({ offer, from }) => {
-    if (!peerConnectionRef.current) return;
+    console.log('Offre reçue de:', from);
+    // Cette fonction sera appelée si on reçoit une offre après avoir accepté
+    if (!peerConnectionRef.current) {
+      createPeerConnection();
+    }
     
     await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(offer));
-    const answer = await peerConnectionRef.current.createAnswer();
-    await peerConnectionRef.current.setLocalDescription(answer);
-    
-    socket.emit('answer', { to: from, answer });
   };
 
   const handleAnswer = async ({ answer }) => {
-    await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+    console.log('Réponse reçue');
+    if (peerConnectionRef.current) {
+      await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+      setCallStatus('connected');
+    }
   };
 
   const handleIceCandidate = async ({ candidate }) => {
+    console.log('ICE candidate reçu');
     try {
-      await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+      if (peerConnectionRef.current) {
+        await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+      }
     } catch (error) {
       console.error('Erreur lors de l\'ajout du candidat ICE:', error);
     }
@@ -266,7 +309,7 @@ const VideoCallModal = ({
           {callStatus === 'incoming' ? (
             <>
               <button
-                onClick={acceptCall}
+                onClick={() => acceptCall(incomingOfferRef.current)}
                 className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition-all"
                 title="Accepter"
               >

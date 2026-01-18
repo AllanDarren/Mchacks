@@ -34,11 +34,13 @@ const initializeSocket = (io) => {
     });
 
     // Gestion des appels vidéo WebRTC
-    socket.on('call-user', ({ to, offer }) => {
-      console.log(`Appel de ${socket.id} vers ${to}`);
+    socket.on('call-user', ({ to, offer, callerName }) => {
+      const callerId = Array.from(connectedUsers.entries()).find(([_, socketId]) => socketId === socket.id)?.[0];
+      console.log(`Appel de ${callerId} (${callerName}) vers ${to}`);
       io.to(to).emit('incoming-call', {
-        from: Array.from(connectedUsers.entries()).find(([_, socketId]) => socketId === socket.id)?.[0],
+        from: callerId,
         offer,
+        callerName: callerName || 'Utilisateur',
         callerSocketId: socket.id
       });
     });

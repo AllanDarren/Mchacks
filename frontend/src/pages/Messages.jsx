@@ -32,13 +32,22 @@ const Messages = () => {
 
   // Écouter les appels entrants
   useEffect(() => {
-    socket.onIncomingCall((data) => {
-      setIncomingCall(data);
+    if (!socket.socket) return;
+
+    const handleIncomingCall = (data) => {
+      console.log('Appel entrant reçu:', data);
+      setIncomingCall({
+        from: data.from,
+        callerName: data.callerName || 'Utilisateur',
+        offer: data.offer
+      });
       setIsCallModalOpen(true);
-    });
+    };
+
+    socket.socket.on('incoming-call', handleIncomingCall);
 
     return () => {
-      socket.off('incoming-call');
+      socket.socket.off('incoming-call', handleIncomingCall);
     };
   }, [socket]);
 
@@ -308,14 +317,15 @@ const Messages = () => {
       </div>
 
       {/* Modal d'appel vidéo */}
-      {isCallModalOpen && selectedConversation && (
+      {isCallModalOpen && (
         <VideoCallModal
           isOpen={isCallModalOpen}
           onClose={closeCallModal}
-          contactId={incomingCall ? incomingCall.from : selectedConversation.user._id}
-          contactName={incomingCall ? incomingCall.callerName : `${selectedConversation.user.firstName} ${selectedConversation.user.lastName}`}
+          contactId={incomingCall ? incomingCall.from : selectedConversation?.user._id}
+          contactName={incomingCall ? incomingCall.callerName : (selectedConversation ? `${selectedConversation.user.firstName} ${selectedConversation.user.lastName}` : '')}
           isIncoming={!!incomingCall}
           callerId={incomingCall?.from}
+          offer={incomingCall?.offer}
         />
       )}
     </div>
