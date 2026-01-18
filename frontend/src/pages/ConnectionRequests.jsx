@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { usersAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
+import Dialog from '../components/Common/Dialog';
 
 const ConnectionRequests = () => {
   const { user, isMentor } = useAuth();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [acceptingId, setAcceptingId] = useState(null);
+  const [dialog, setDialog] = useState({ isOpen: false, title: '', message: '', type: 'info' });
 
   useEffect(() => {
     if (isMentor) {
@@ -46,14 +48,14 @@ const ConnectionRequests = () => {
     setAcceptingId(studentId);
     try {
       await usersAPI.acceptConnection(studentId);
-      alert('Connection accepted!');
+      setDialog({ isOpen: true, title: 'Success', message: 'Connection accepted!', type: 'success' });
       // Remove request from list
       setRequests(requests.filter(r => r._id !== studentId));
     } catch (error) {
       console.error('Full error:', error);
       console.error('Server response:', error.response?.data);
       const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
-      alert(`Error during acceptance: ${errorMessage}`);
+      setDialog({ isOpen: true, title: 'Error', message: `Error during acceptance: ${errorMessage}`, type: 'error' });
     }
     setAcceptingId(null);
   };
@@ -62,7 +64,7 @@ const ConnectionRequests = () => {
     try {
       // Here, you could implement a reject function
       setRequests(requests.filter(r => r._id !== studentId));
-      alert('Request rejected');
+      setDialog({ isOpen: true, title: 'Success', message: 'Request rejected', type: 'success' });
     } catch (error) {
       console.error('Erreur:', error);
     }
@@ -161,6 +163,13 @@ const ConnectionRequests = () => {
           </p>
         </div>
       )}
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog({ ...dialog, isOpen: false })}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+      />
     </div>
   );
 };

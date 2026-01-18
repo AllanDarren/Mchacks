@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { usersAPI } from '../services/api';
+import Dialog from '../components/Common/Dialog';
 
 const Profile = () => {
   const { user, updateUser, isStudent, isMentor } = useAuth();
   const [editing, setEditing] = useState(false);
+  const [dialog, setDialog] = useState({ isOpen: false, title: '', message: '', type: 'info' });
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
@@ -18,10 +20,10 @@ const Profile = () => {
       const response = await usersAPI.updateProfile(formData);
       updateUser(response.data);
       setEditing(false);
-      alert('Profil mis à jour avec succès!');
+      setDialog({ isOpen: true, title: 'Success', message: 'Profile updated successfully!', type: 'success' });
     } catch (error) {
       console.error('Erreur:', error);
-      alert('Erreur lors de la mise à jour');
+      setDialog({ isOpen: true, title: 'Error', message: 'Error updating profile', type: 'error' });
     }
   };
 
@@ -323,6 +325,13 @@ const Profile = () => {
           </div>
         </form>
       </div>
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog({ ...dialog, isOpen: false })}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+      />
     </div>
   );
 };

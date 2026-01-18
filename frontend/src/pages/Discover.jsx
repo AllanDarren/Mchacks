@@ -3,12 +3,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { usersAPI } from '../services/api';
 import MentorCard from '../components/Discovery/MentorCard';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
+import Dialog from '../components/Common/Dialog';
 
 const Discover = () => {
   const { user } = useAuth();
   const [mentors, setMentors] = useState([]);
   const [myConnections, setMyConnections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dialog, setDialog] = useState({ isOpen: false, title: '', message: '', type: 'info' });
   const [filters, setFilters] = useState({
     search: '',
     industry: '',
@@ -53,13 +55,13 @@ const Discover = () => {
   const handleConnect = async (mentorId) => {
     try {
       await usersAPI.requestConnection(mentorId);
-      alert('Connection request sent!');
+      setDialog({ isOpen: true, title: 'Success', message: 'Connection request sent!', type: 'success' });
       // Refresh connections and mentors
       await fetchMyConnections();
       await fetchMentors();
     } catch (error) {
       console.error('Error:', error);
-      alert('Error sending request');
+      setDialog({ isOpen: true, title: 'Error', message: 'Error sending request', type: 'error' });
     }
   };
 
@@ -203,6 +205,13 @@ const Discover = () => {
           )}
         </div>
       )}
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog({ ...dialog, isOpen: false })}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+      />
     </div>
   );
 };

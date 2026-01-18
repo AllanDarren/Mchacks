@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiCalendar, FiClock, FiMapPin, FiVideo, FiX, FiUser, FiMail } from 'react-icons/fi';
 import api from '../services/api';
+import Dialog from '../components/Common/Dialog';
 
 const MyBookings = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const MyBookings = () => {
   const [filter, setFilter] = useState('upcoming'); // upcoming, past, all
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [dialog, setDialog] = useState({ isOpen: false, title: '', message: '', type: 'info' });
 
   useEffect(() => {
     loadBookings();
@@ -48,10 +50,10 @@ const MyBookings = () => {
       setShowCancelModal(false);
       setSelectedBooking(null);
       loadBookings();
-      alert('Appointment cancelled');
+      setDialog({ isOpen: true, title: 'Success', message: 'Appointment cancelled', type: 'success' });
     } catch (error) {
       console.error('Error:', error);
-      alert('Error cancelling appointment');
+      setDialog({ isOpen: true, title: 'Error', message: 'Error cancelling appointment', type: 'error' });
     }
   };
 
@@ -279,6 +281,13 @@ const MyBookings = () => {
           </div>
         </div>
       )}
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog({ ...dialog, isOpen: false })}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+      />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { messagesAPI, usersAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
+import Dialog from '../components/Common/Dialog';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -14,6 +15,7 @@ const Messages = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [dialog, setDialog] = useState({ isOpen: false, title: '', message: '', type: 'info' });
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -126,7 +128,7 @@ const Messages = () => {
       console.error('Erreur lors de l\'envoi du message:', error);
       // Restaurer le message en cas d'erreur
       setNewMessage(messageContent);
-      alert('Erreur lors de l\'envoi du message. Veuillez réessayer.');
+      setDialog({ isOpen: true, title: 'Error', message: 'Error sending message. Please try again.', type: 'error' });
     }
   };
 
@@ -286,6 +288,13 @@ const Messages = () => {
           </div>
         </div>
       </div>
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog({ ...dialog, isOpen: false })}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+      />
     </div>
   );
 };

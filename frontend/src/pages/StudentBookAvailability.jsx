@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FiCalendar, FiClock, FiMapPin, FiVideo, FiX, FiArrowLeft } from 'react-icons/fi';
 import { BiCalendarEvent } from 'react-icons/bi';
 import api from '../services/api';
+import Dialog from '../components/Common/Dialog';
 
 const StudentBookAvailability = () => {
   const { mentorId } = useParams();
@@ -16,6 +17,7 @@ const StudentBookAvailability = () => {
   const [bookingNotes, setBookingNotes] = useState('');
   const [currentWeek, setCurrentWeek] = useState(0);
   const [error, setError] = useState(null);
+  const [dialog, setDialog] = useState({ isOpen: false, title: '', message: '', type: 'info' });
 
   const loadData = useCallback(async () => {
     try {
@@ -46,7 +48,7 @@ const StudentBookAvailability = () => {
       setLoading(true);
       setError(null);
       await api.availabilityAPI.bookSlot(selectedSlot._id, { notes: bookingNotes });
-      alert('Plage réservée avec succès! 🎉');
+      setDialog({ isOpen: true, title: 'Success', message: 'Appointment booked successfully! 🎉', type: 'success' });
       setShowBookingModal(false);
       setSelectedSlot(null);
       setBookingNotes('');
@@ -381,6 +383,13 @@ const StudentBookAvailability = () => {
           </div>
         </div>
       )}
+      <Dialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog({ ...dialog, isOpen: false })}
+        title={dialog.title}
+        message={dialog.message}
+        type={dialog.type}
+      />
     </div>
   );
 };
