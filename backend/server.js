@@ -13,6 +13,7 @@ const messageRoutes = require('./routes/messages');
 const appointmentRoutes = require('./routes/appointments');
 const internshipRoutes = require('./routes/internships');
 const notificationRoutes = require('./routes/notifications');
+const availabilityRoutes = require('./routes/availability');
 
 // Connexion à la base de données
 connectDB();
@@ -21,7 +22,11 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      process.env.FRONTEND_URL
+    ].filter(Boolean),
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -35,7 +40,11 @@ global.io = io;
 
 // Middlewares
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    process.env.FRONTEND_URL
+  ].filter(Boolean),
   credentials: true
 }));
 app.use(express.json());
@@ -51,6 +60,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/internships', internshipRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/availability', availabilityRoutes);
 
 // Route de test
 app.get('/', (req, res) => {

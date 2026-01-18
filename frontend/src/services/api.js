@@ -87,4 +87,25 @@ export const notificationsAPI = {
   deleteNotification: (notificationId) => api.delete(`/notifications/${notificationId}`)
 };
 
-export default api;
+// Availability API
+export const availabilityAPI = {
+  createSlot: (slotData) => api.post('/availability', slotData),
+  getMentorSlots: (mentorId) => api.get(`/availability/mentor/${mentorId}`),
+  getAvailableSlots: (mentorId, params) => api.get(`/availability/available/${mentorId}`, { params }),
+  getStudentBookings: () => api.get('/availability/my-bookings'),
+  updateSlot: (slotId, slotData) => api.put(`/availability/${slotId}`, slotData),
+  moveSlot: (slotId, moveData) => api.patch(`/availability/${slotId}/move`, moveData),
+  deleteSlot: (slotId) => api.delete(`/availability/${slotId}`),
+  bookSlot: (slotId, bookingData) => api.post(`/availability/${slotId}/book`, bookingData),
+  cancelBooking: (slotId) => api.post(`/availability/${slotId}/cancel`)
+};
+
+export default {
+  authAPI,
+  usersAPI,
+  messagesAPI,
+  appointmentsAPI,
+  internshipsAPI,
+  notificationsAPI,
+  availabilityAPI
+};

@@ -17,6 +17,9 @@ import Internships from './pages/Internships';
 import Profile from './pages/Profile';
 import ConnectionRequests from './pages/ConnectionRequests';
 import Connections from './pages/Connections';
+import MentorAvailability from './pages/MentorAvailability';
+import StudentBookAvailability from './pages/StudentBookAvailability';
+import MyBookings from './pages/MyBookings';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -134,6 +137,32 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Connections />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Availability Routes */}
+          <Route
+            path="/availability"
+            element={
+              <ProtectedRoute>
+                <MentorAvailability />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/book-availability/:mentorId"
+            element={
+              <ProtectedRoute>
+                <StudentBookAvailability />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-bookings"
+            element={
+              <ProtectedRoute>
+                <MyBookings />
               </ProtectedRoute>
             }
           />

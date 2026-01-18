@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { usersAPI } from '../services/api';
 import MentorCard from '../components/Discovery/MentorCard';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 
 const Discover = () => {
+  const { user } = useAuth();
   const [mentors, setMentors] = useState([]);
+  const [myConnections, setMyConnections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     search: '',
@@ -13,25 +16,47 @@ const Discover = () => {
     communicationType: ''
   });
 
+  const fetchMyConnections = useCallback(async () => {
+    try {
+      const response = await usersAPI.getProfile(user._id);
+      setMyConnections(response.data.connections || []);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des connexions:', error);
+    }
+  }, [user._id]);
+
   const fetchMentors = useCallback(async () => {
     setLoading(true);
     try {
       const response = await usersAPI.searchMentors(filters);
-      setMentors(response.data.mentors);
+      // Filtrer les mentors déjà connectés
+      const filteredMentors = response.data.mentors.filter(
+        mentor => !myConnections.includes(mentor._id)
+      );
+      setMentors(filteredMentors);
     } catch (error) {
       console.error('Erreur lors de la récupération des mentors:', error);
     }
     setLoading(false);
-  }, [filters]);
+  }, [filters, myConnections]);
 
   useEffect(() => {
-    fetchMentors();
-  }, [fetchMentors]);
+    fetchMyConnections();
+  }, [fetchMyConnections]);
+
+  useEffect(() => {
+    if (myConnections.length >= 0) {
+      fetchMentors();
+    }
+  }, [fetchMentors, myConnections]);
 
   const handleConnect = async (mentorId) => {
     try {
       await usersAPI.requestConnection(mentorId);
       alert('Demande de connexion envoyée!');
+      // Rafraîchir les connexions et mentors
+      await fetchMyConnections();
+      await fetchMentors();
     } catch (error) {
       console.error('Erreur:', error);
       alert('Erreur lors de l\'envoi de la demande');
