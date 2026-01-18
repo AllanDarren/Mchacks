@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FiCalendar } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
@@ -54,14 +55,32 @@ const Navbar = () => {
               >
                 Stages
               </Link>
-              {isMentor && (
+              {!isMentor && (
                 <Link
-                  to="/connection-requests"
-                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium relative"
+                  to="/my-bookings"
+                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                 >
-                  Demandes
-                  <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">!</span>
+                  <FiCalendar className="mr-1" size={18} />
+                  Mes rendez-vous
                 </Link>
+              )}
+              {isMentor && (
+                <>
+                  <Link
+                    to="/connection-requests"
+                    className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium relative"
+                  >
+                    Demandes
+                    <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">!</span>
+                  </Link>
+                  <Link
+                    to="/availability"
+                    className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  >
+                    <FiCalendar className="mr-1" size={18} />
+                    Disponibilité
+                  </Link>
+                </>
               )}
             </div>
           </div>

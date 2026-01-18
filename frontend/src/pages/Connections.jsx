@@ -189,13 +189,24 @@ const Connections = () => {
                   )}
 
                   {/* Bouton de messagerie */}
-                  <button
-                    onClick={() => handleOpenChat(connection._id)}
-                    className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
-                  >
-                    <span>💬</span>
-                    <span>Envoyer un message</span>
-                  </button>
+                  <div className="flex gap-2">
+                    {connection.role === 'mentor' && (
+                      <button
+                        onClick={() => navigate(`/book-availability/${connection._id}`)}
+                        className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                      >
+                        <span>📅</span>
+                        <span>Voir les disponibilités</span>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleOpenChat(connection._id)}
+                      className={`${connection.role === 'mentor' ? 'flex-1' : 'w-full'} py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2`}
+                    >
+                      <span>💬</span>
+                      <span>Envoyer un message</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             );
