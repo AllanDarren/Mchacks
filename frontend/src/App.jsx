@@ -5,6 +5,7 @@ import { SocketProvider } from './contexts/SocketContext';
 
 // Components
 import Navbar from './components/Common/Navbar';
+import Chatbot from './components/Common/Chatbot';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 
@@ -52,6 +53,8 @@ const PublicRoute = ({ children }) => {
 };
 
 function AppContent() {
+  const { isAuthenticated } = useAuth();
+  
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
@@ -170,6 +173,9 @@ function AppContent() {
           {/* 404 */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
+        
+        {/* Chatbot - Only show when authenticated */}
+        {isAuthenticated && <Chatbot />}
       </div>
     </Router>
   );

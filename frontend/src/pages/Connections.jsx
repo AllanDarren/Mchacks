@@ -121,7 +121,7 @@ const Connections = () => {
                         {connection.firstName} {connection.lastName}
                       </h3>
                       <p className="text-indigo-100 text-sm">
-                        {connection.role === 'mentor' ? '👔 Mentor' : '🎓 Étudiant'}
+                        {connection.role === 'mentor' ? ' Mentor' : ' Étudiant'}
                       </p>
                     </div>
                   </div>
@@ -203,7 +203,6 @@ const Connections = () => {
                       onClick={() => handleOpenChat(connection._id)}
                       className={`${connection.role === 'mentor' ? 'flex-1' : 'w-full'} py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2`}
                     >
-                      <span>💬</span>
                       <span>Envoyer un message</span>
                     </button>
                   </div>
@@ -218,7 +217,7 @@ const Connections = () => {
       {connections.length > 0 && (
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-blue-800 text-sm">
-            💡 <strong>Conseil:</strong> Cliquez sur une connexion pour accéder à la messagerie et communiquer en temps réel !
+            💡 Cliquez sur une connexion pour accéder à la messagerie et communiquer en temps réel !
           </p>
         </div>
       )}
