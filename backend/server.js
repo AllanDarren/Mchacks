@@ -4,6 +4,7 @@ const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
 const connectDB = require('./config/database');
+const { initializeSocket } = require('./config/socket');
 
 // Import des routes
 const authRoutes = require('./routes/auth');
@@ -25,6 +26,12 @@ const io = socketIo(server, {
     credentials: true
   }
 });
+
+// Initialiser Socket.io
+initializeSocket(io);
+
+// Rendre io accessible globalement
+global.io = io;
 
 // Middlewares
 app.use(cors({
@@ -50,59 +57,6 @@ app.get('/', (req, res) => {
   res.json({ message: 'API de mentorat - Bienvenue!' });
 });
 
-// Gestion des connexions Socket.io
-const connectedUsers = new Map();
-
-io.on('connection', (socket) => {
-  console.log('Nouvelle connexion Socket.io:', socket.id);
-
-  // Enregistrer l'utilisateur
-  socket.on('register', (userId) => {
-    connectedUsers.set(userId, socket.id);
-    socket.join(userId);
-    console.log(`Utilisateur ${userId} enregistré avec socket ${socket.id}`);
-    
-    // Notifier le statut en ligne
-    socket.broadcast.emit('user-online', userId);
-  });
-
-  // Gérer les messages en temps réel
-  socket.on('send-message', (data) => {
-    const { receiverId, message } = data;
-    const receiverSocketId = connectedUsers.get(receiverId);
-    
-    if (receiverSocketId) {
-      io.to(receiverId).emit('receive-message', message);
-    }
-  });
-
-  // Notification d'écriture en cours
-  socket.on('typing', (data) => {
-    const { receiverId, isTyping } = data;
-    io.to(receiverId).emit('user-typing', { 
-      userId: data.senderId, 
-      isTyping 
-    });
-  });
-
-  // Déconnexion
-  socket.on('disconnect', () => {
-    let disconnectedUserId;
-    for (let [userId, socketId] of connectedUsers.entries()) {
-      if (socketId === socket.id) {
-        disconnectedUserId = userId;
-        connectedUsers.delete(userId);
-        break;
-      }
-    }
-    
-    if (disconnectedUserId) {
-      socket.broadcast.emit('user-offline', disconnectedUserId);
-      console.log(`Utilisateur ${disconnectedUserId} déconnecté`);
-    }
-  });
-});
-
 // Middleware de gestion des erreurs
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -118,4 +72,4 @@ server.listen(PORT, () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
 });
 
-module.exports = { app, io };
+module.exports = { app, io, server };

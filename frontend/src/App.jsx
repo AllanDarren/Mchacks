@@ -15,6 +15,8 @@ import Discover from './pages/Discover';
 import Messages from './pages/Messages';
 import Internships from './pages/Internships';
 import Profile from './pages/Profile';
+import ConnectionRequests from './pages/ConnectionRequests';
+import Connections from './pages/Connections';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -116,6 +118,22 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/connection-requests"
+            element={
+              <ProtectedRoute>
+                <ConnectionRequests />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/connections"
+            element={
+              <ProtectedRoute>
+                <Connections />
               </ProtectedRoute>
             }
           />

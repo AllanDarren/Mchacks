@@ -1,18 +1,27 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { appointmentsAPI, usersAPI } from '../services/api';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 
 const Dashboard = () => {
-  const { user, isStudent } = useAuth();
+  const { user, isStudent, isMentor } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
+  const [connections, setConnections] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchData = useCallback(async () => {
     try {
       const appointmentsRes = await appointmentsAPI.getMyAppointments({ upcoming: 'true' });
       setAppointments(appointmentsRes.data);
+
+      // Récupérer les connexions
+      const profileRes = await usersAPI.getProfile(user._id);
+      setConnections(profileRes.data.connections || []);
+      setPendingRequests(profileRes.data.pendingConnections || []);
 
       if (isStudent) {
         const recsRes = await usersAPI.getRecommendations();
@@ -22,7 +31,7 @@ const Dashboard = () => {
       console.error('Erreur:', error);
     }
     setLoading(false);
-  }, [isStudent]);
+  }, [isStudent, user._id]);
 
   useEffect(() => {
     fetchData();
@@ -43,9 +52,10 @@ const Dashboard = () => {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-sm font-medium text-gray-500">Sessions à venir</h3>
-          <p className="text-3xl font-bold text-indigo-600 mt-2">{appointments.length}</p>
+        <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition" onClick={() => navigate('/connections')}>
+          <h3 className="text-sm font-medium text-gray-500">Connexions acceptées</h3>
+          <p className="text-3xl font-bold text-indigo-600 mt-2">{connections.length}</p>
+          <p className="text-xs text-gray-500 mt-2">Cliquez pour voir vos contacts</p>
         </div>
         
         <div className="bg-white rounded-lg shadow p-6">
@@ -53,14 +63,24 @@ const Dashboard = () => {
             {isStudent ? 'Mentors connectés' : 'Étudiants aidés'}
           </h3>
           <p className="text-3xl font-bold text-indigo-600 mt-2">
-            {user?.connections?.length || 0}
+            {connections.length}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-sm font-medium text-gray-500">Profil complété</h3>
-          <p className="text-3xl font-bold text-indigo-600 mt-2">85%</p>
-        </div>
+        {isMentor && (
+          <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition border-2 border-red-200" onClick={() => navigate('/connection-requests')}>
+            <h3 className="text-sm font-medium text-gray-500">Demandes en attente</h3>
+            <p className="text-3xl font-bold text-red-600 mt-2">{pendingRequests.length}</p>
+            <p className="text-xs text-red-500 mt-2">⚠️ À traiter</p>
+          </div>
+        )}
+
+        {!isMentor && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-sm font-medium text-gray-500">Profil complété</h3>
+            <p className="text-3xl font-bold text-indigo-600 mt-2">85%</p>
+          </div>
+        )}
       </div>
 
       {/* Prochaines sessions */}

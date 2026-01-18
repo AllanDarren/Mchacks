@@ -110,6 +110,12 @@ exports.sendMessage = async (req, res) => {
       .populate('senderId', 'firstName lastName profilePicture')
       .populate('receiverId', 'firstName lastName profilePicture');
 
+    // Émettre le message en temps réel via Socket.io
+    if (global.io) {
+      global.io.to(receiverId.toString()).emit('receive-message', populatedMessage);
+      console.log(`Message émis au destinataire ${receiverId}`);
+    }
+
     // Créer une notification pour le destinataire
     await Notification.create({
       userId: receiverId,
