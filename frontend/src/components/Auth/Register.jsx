@@ -138,9 +138,6 @@ const Register = () => {
                   >
                     <span className="text-2xl">🎓</span>
                     <p className="font-medium mt-2">Étudiant</p>
-                    {formData.role === 'student' && (
-                      <p className="text-xs text-indigo-600 mt-1">✓ Sélectionné</p>
-                    )}
                   </button>
                   <button
                     type="button"
@@ -156,9 +153,7 @@ const Register = () => {
                   >
                     <span className="text-2xl">👔</span>
                     <p className="font-medium mt-2">Mentor</p>
-                    {formData.role === 'mentor' && (
-                      <p className="text-xs text-indigo-600 mt-1">✓ Sélectionné</p>
-                    )}
+
                   </button>
                 </div>
               </div>
@@ -205,6 +200,7 @@ const Register = () => {
                 <input
                   type="password"
                   name="password"
+                  required
                   placeholder="Au moins 6 caractères"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   value={formData.password}
@@ -219,17 +215,6 @@ const Register = () => {
                   type="password"
                   name="confirmPassword"
                   placeholder="Répétez votre mot de passe"h={6}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Confirmer le mot de passe</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   value={formData.confirmPassword}
