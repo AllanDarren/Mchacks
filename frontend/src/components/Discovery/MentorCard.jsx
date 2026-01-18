@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MentorCard = ({ mentor, onConnect }) => {
+const MentorCard = ({ mentor, onConnect, userRole }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       <div className="p-6">
@@ -56,12 +56,14 @@ const MentorCard = ({ mentor, onConnect }) => {
         )}
 
         <div className="flex gap-2">
-          <button
-            onClick={() => onConnect(mentor._id)}
-            className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
-          >
-            Connect
-          </button>
+          {userRole === 'student' && (
+            <button
+              onClick={() => onConnect(mentor._id)}
+              className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
+            >
+              Connect
+            </button>
+          )}
         </div>
       </div>
     </div>
