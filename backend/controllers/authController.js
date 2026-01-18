@@ -14,6 +14,13 @@ const generateToken = (id) => {
 // @access  Public
 exports.register = async (req, res) => {
   try {
+    // Check validation errors
+    const { validationResult } = require('express-validator');
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg, errors: errors.array() });
+    }
+
     const { email, password, role, firstName, lastName, studentInfo, mentorInfo } = req.body;
 
     // Vérifier si l'utilisateur existe déjà
@@ -53,6 +60,13 @@ exports.register = async (req, res) => {
 // @access  Public
 exports.login = async (req, res) => {
   try {
+    // Check validation errors
+    const { validationResult } = require('express-validator');
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg, errors: errors.array() });
+    }
+
     const { email, password } = req.body;
 
     // Trouver l'utilisateur
