@@ -70,7 +70,6 @@ const Navbar = () => {
                     className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium relative"
                   >
                     Requests
-                    <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">!</span>
                   </Link>
                   <Link
                     to="/availability"
