@@ -27,7 +27,14 @@ const ConnectionRequests = () => {
             usersAPI.getProfile(studentId)
           )
         );
-        setRequests(studentsDetails.map(res => res.data));
+        
+        // Filtrer les étudiants qui ne sont pas déjà dans les connexions
+        const myConnections = response.data.connections || [];
+        const filteredRequests = studentsDetails
+          .map(res => res.data)
+          .filter(student => !myConnections.includes(student._id));
+        
+        setRequests(filteredRequests);
       }
     } catch (error) {
       console.error('Erreur:', error);
@@ -43,8 +50,10 @@ const ConnectionRequests = () => {
       // Retirer la demande de la liste
       setRequests(requests.filter(r => r._id !== studentId));
     } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de l\'acceptation');
+      console.error('Erreur complète:', error);
+      console.error('Réponse du serveur:', error.response?.data);
+      const errorMessage = error.response?.data?.message || error.message || 'Erreur inconnue';
+      alert(`Erreur lors de l'acceptation: ${errorMessage}`);
     }
     setAcceptingId(null);
   };
