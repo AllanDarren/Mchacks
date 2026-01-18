@@ -87,4 +87,9 @@ export const notificationsAPI = {
   deleteNotification: (notificationId) => api.delete(`/notifications/${notificationId}`)
 };
 
+// Video Call API
+export const videocallAPI = {
+  createRoom: (contactId) => api.post('/videocall/create-room', { contactId })
+};
+
 export default api;

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { messagesAPI, usersAPI } from '../services/api';
+import { messagesAPI, usersAPI, videocallAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
-import VideoCallModal from '../components/VideoCall/VideoCallModal';
+import DailyVideoCall from '../components/VideoCall/DailyVideoCall';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -17,9 +17,10 @@ const Messages = () => {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
   
-  // État pour les appels vidéo
-  const [isCallModalOpen, setIsCallModalOpen] = useState(false);
-  const [incomingCall, setIncomingCall] = useState(null);
+  // État pour les appels vidéo Daily.co
+  const [callRoomUrl, setCallRoomUrl] = useState(null);
+  const [incomingCallRoom, setIncomingCallRoom] = useState(null);
+  const [outgoingCall, setOutgoingCall] = useState(false); // Nouveau: pour savoir si on a initié l'appel
 
   // Auto-scroll vers le bas quand de nouveaux messages arrivent
   const scrollToBottom = () => {
@@ -30,26 +31,44 @@ const Messages = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Écouter les appels entrants
+  // Écouter les appels entrants via socket
   useEffect(() => {
     if (!socket.socket) return;
 
     const handleIncomingCall = (data) => {
-      console.log('Appel entrant reçu:', data);
-      setIncomingCall({
-        from: data.from,
-        callerName: data.callerName || 'Utilisateur',
-        offer: data.offer
+      console.log('Appel entrant Daily.co reçu:', data);
+      
+      // Ne pas afficher la notification si on est déjà en appel
+      if (callRoomUrl) {
+        console.log('Déjà en appel, invitation ignorée');
+        return;
+      }
+      
+      // Ne pas traiter notre propre invitation (quand on est l'appelant)
+      if (outgoingCall) {
+        console.log('C\'est notre propre appel, ignoré');
+        return;
+      }
+      
+      // Ne pas écraser une invitation déjà affichée
+      setIncomingCallRoom((prev) => {
+        if (prev) {
+          console.log('Invitation déjà en cours, ignorée');
+          return prev;
+        }
+        return {
+          roomUrl: data.roomUrl,
+          callerName: data.callerName || 'Utilisateur'
+        };
       });
-      setIsCallModalOpen(true);
     };
 
-    socket.socket.on('incoming-call', handleIncomingCall);
+    socket.socket.on('video-call-invite', handleIncomingCall);
 
     return () => {
-      socket.socket.off('incoming-call', handleIncomingCall);
+      socket.socket.off('video-call-invite', handleIncomingCall);
     };
-  }, [socket]);
+  }, [socket, callRoomUrl, outgoingCall]);
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -156,15 +175,56 @@ const Messages = () => {
     }
   };
 
-  const startCall = () => {
-    if (selectedConversation) {
-      setIsCallModalOpen(true);
+  const startCall = async () => {
+    if (!selectedConversation) return;
+    
+    try {
+      console.log('Création d\'une salle Daily.co pour:', selectedConversation.user._id);
+      
+      // Marquer qu'on initie un appel sortant
+      setOutgoingCall(true);
+      
+      // Créer une salle sur le serveur
+      const response = await videocallAPI.createRoom(selectedConversation.user._id);
+      const { roomUrl } = response.data;
+      
+      console.log('Salle créée:', roomUrl);
+      
+      // Ouvrir la salle pour moi
+      setCallRoomUrl(roomUrl);
+      
+      // Envoyer l'invitation via socket
+      socket.socket.emit('video-call-invite', {
+        to: selectedConversation.user._id,
+        roomUrl,
+        callerName: `${user.firstName} ${user.lastName}`
+      });
+      
+      console.log('Invitation envoyée via socket');
+    } catch (error) {
+      console.error('Erreur lors de la création de la salle:', error);
+      alert('Impossible de démarrer l\'appel vidéo');
+      setOutgoingCall(false);
     }
   };
 
-  const closeCallModal = () => {
-    setIsCallModalOpen(false);
-    setIncomingCall(null);
+  const acceptIncomingCall = () => {
+    console.log('Acceptation de l\'appel:', incomingCallRoom);
+    if (incomingCallRoom) {
+      setCallRoomUrl(incomingCallRoom.roomUrl);
+      setIncomingCallRoom(null);
+    }
+  };
+
+  const rejectIncomingCall = () => {
+    console.log('Refus de l\'appel');
+    setIncomingCallRoom(null);
+  };
+
+  const closeCall = () => {
+    console.log('Fermeture de l\'appel vidéo');
+    setCallRoomUrl(null);
+    setOutgoingCall(false); // Réinitialiser le flag d'appel sortant
   };
 
   if (loading) {
@@ -316,17 +376,43 @@ const Messages = () => {
         )}
       </div>
 
-      {/* Modal d'appel vidéo */}
-      {isCallModalOpen && (
-        <VideoCallModal
-          isOpen={isCallModalOpen}
-          onClose={closeCallModal}
-          contactId={incomingCall ? incomingCall.from : selectedConversation?.user._id}
-          contactName={incomingCall ? incomingCall.callerName : (selectedConversation ? `${selectedConversation.user.firstName} ${selectedConversation.user.lastName}` : '')}
-          isIncoming={!!incomingCall}
-          callerId={incomingCall?.from}
-          offer={incomingCall?.offer}
+      {/* Daily.co Video Call */}
+      {callRoomUrl && (
+        <DailyVideoCall
+          roomUrl={callRoomUrl}
+          onLeave={closeCall}
         />
+      )}
+
+      {/* Notification d'appel entrant */}
+      {incomingCallRoom && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+            <div className="text-center">
+              <div className="mb-4">
+                <svg className="w-16 h-16 mx-auto text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Appel vidéo entrant</h3>
+              <p className="text-gray-600 mb-6">{incomingCallRoom.callerName} vous appelle</p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={rejectIncomingCall}
+                  className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
+                >
+                  Refuser
+                </button>
+                <button
+                  onClick={acceptIncomingCall}
+                  className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+                >
+                  Accepter
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -13,6 +13,7 @@ const messageRoutes = require('./routes/messages');
 const appointmentRoutes = require('./routes/appointments');
 const internshipRoutes = require('./routes/internships');
 const notificationRoutes = require('./routes/notifications');
+const videocallRoutes = require('./routes/videocall');
 
 // Connexion à la base de données
 connectDB();
@@ -51,6 +52,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/internships', internshipRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/videocall', videocallRoutes);
 
 // Route de test
 app.get('/', (req, res) => {
