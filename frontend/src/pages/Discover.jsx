@@ -65,43 +65,128 @@ const Discover = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Découvrir des mentors</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">Découvrir des mentors</h1>
+      <p className="text-gray-600 mb-6">Trouvez le mentor idéal selon vos besoins</p>
 
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <input
-          type="text"
-          placeholder="Rechercher..."
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-          value={filters.search}
-          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-        />
+      {/* Section de filtres améliorée */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          Filtres de recherche
+        </h2>
         
-        <select
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-          value={filters.communicationType}
-          onChange={(e) => setFilters({ ...filters, communicationType: e.target.value })}
-        >
-          <option value="">Type de communication</option>
-          <option value="messaging">Messagerie</option>
-          <option value="virtual">Rencontre virtuelle</option>
-          <option value="in-person">En personne</option>
-        </select>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Recherche générale */}
+          {/* <div className="lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Recherche par nom
+            </label>
+            <input
+              type="text"
+              placeholder="Nom, prénom..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              value={filters.search}
+              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            />
+          </div> */}
 
-        <input
-          type="text"
-          placeholder="Secteur d'activité"
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-          value={filters.industry}
-          onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
-        />
+          {/* Type de communication */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Type de communication
+            </label>
+            <select
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              value={filters.communicationType}
+              onChange={(e) => setFilters({ ...filters, communicationType: e.target.value })}
+            >
+              <option value="">Tous les types</option>
+              <option value="messaging">Messagerie</option>
+              <option value="virtual">Rencontre virtuelle</option>
+              <option value="in-person">En personne</option>
+            </select>
+          </div>
 
-        <input
-          type="text"
-          placeholder="Expertise"
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-          value={filters.expertise}
-          onChange={(e) => setFilters({ ...filters, expertise: e.target.value })}
-        />
+          {/* Bouton reset */}
+
+
+          {/* Secteur d'activité */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Secteur d'activité
+            </label>
+            <input
+              type="text"
+              placeholder="Ex: Finance, Technologie..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              value={filters.industry}
+              onChange={(e) => setFilters({ ...filters, industry: e.target.value })}
+            />
+          </div>
+
+          {/* Expertise */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Expertise
+            </label>
+            <input
+              type="text"
+              placeholder="Ex: Marketing, Développement..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              value={filters.expertise}
+              onChange={(e) => setFilters({ ...filters, expertise: e.target.value })}
+            />
+          </div>
+                    <div className="flex items-end">
+            <button
+              onClick={() => setFilters({ search: '', industry: '', expertise: '', communicationType: '' })}
+              className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+
+        {/* Filtres actifs */}
+        {(filters.search || filters.industry || filters.expertise || filters.communicationType) && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-sm text-gray-600 mb-2">Filtres actifs:</p>
+            <div className="flex flex-wrap gap-2">
+              {filters.search && (
+                <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full">
+                  Nom: {filters.search}
+                </span>
+              )}
+              {filters.industry && (
+                <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full">
+                  Secteur: {filters.industry}
+                </span>
+              )}
+              {filters.expertise && (
+                <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full">
+                  Expertise: {filters.expertise}
+                </span>
+              )}
+              {filters.communicationType && (
+                <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full">
+                  Type: {filters.communicationType === 'messaging' ? 'Messagerie' : filters.communicationType === 'virtual' ? 'Virtuel' : 'En personne'}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Résultats */}
+      <div className="mb-4">
+        <p className="text-gray-600">
+          {loading ? 'Chargement...' : `${mentors.length} mentor${mentors.length > 1 ? 's' : ''} trouvé${mentors.length > 1 ? 's' : ''}`}
+        </p>
       </div>
 
       {loading ? (

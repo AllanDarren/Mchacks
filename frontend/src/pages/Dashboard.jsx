@@ -71,7 +71,6 @@ const Dashboard = () => {
           <div className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition border-2 border-red-200" onClick={() => navigate('/connection-requests')}>
             <h3 className="text-sm font-medium text-gray-500">Demandes en attente</h3>
             <p className="text-3xl font-bold text-red-600 mt-2">{pendingRequests.length}</p>
-            <p className="text-xs text-red-500 mt-2">⚠️ À traiter</p>
           </div>
         )}
 

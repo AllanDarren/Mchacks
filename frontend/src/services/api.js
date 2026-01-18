@@ -100,6 +100,11 @@ export const availabilityAPI = {
   cancelBooking: (slotId) => api.post(`/availability/${slotId}/cancel`)
 };
 
+// Chatbot API
+export const chatbotAPI = {
+  sendMessage: (messageData) => api.post('/chatbot/chat', messageData)
+};
+
 export default {
   authAPI,
   usersAPI,
@@ -107,5 +112,6 @@ export default {
   appointmentsAPI,
   internshipsAPI,
   notificationsAPI,
-  availabilityAPI
+  availabilityAPI,
+  chatbotAPI
 };

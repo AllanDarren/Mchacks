@@ -27,7 +27,7 @@ const Register = () => {
       industry: '',
       expertise: [],
       bio: '',
-      communicationPreferences: []
+      preferredCommunication: []
     }
   });
   const [error, setError] = useState('');
@@ -449,16 +449,16 @@ const Register = () => {
                     <input
                       type="checkbox"
                       className="form-checkbox text-indigo-600"
-                      checked={formData.mentorInfo.favoriteCommunication?.includes('messagerie')}
+                      checked={formData.mentorInfo.preferredCommunication?.includes('messaging')}
                       onChange={e => {
                         const checked = e.target.checked;
                         setFormData({
                           ...formData,
                           mentorInfo: {
                             ...formData.mentorInfo,
-                            favoriteCommunication: checked
-                              ? [...(formData.mentorInfo.favoriteCommunication || []), 'messagerie']
-                              : (formData.mentorInfo.favoriteCommunication || []).filter(val => val !== 'messagerie')
+                            preferredCommunication: checked
+                              ? [...(formData.mentorInfo.preferredCommunication || []), 'messaging']
+                              : (formData.mentorInfo.preferredCommunication || []).filter(val => val !== 'messaging')
                           }
                         });
                       }}
@@ -469,16 +469,16 @@ const Register = () => {
                     <input
                       type="checkbox"
                       className="form-checkbox text-indigo-600"
-                      checked={formData.mentorInfo.favoriteCommunication?.includes('virtuelle')}
+                      checked={formData.mentorInfo.preferredCommunication?.includes('virtual')}
                       onChange={e => {
                         const checked = e.target.checked;
                         setFormData({
                           ...formData,
                           mentorInfo: {
                             ...formData.mentorInfo,
-                            favoriteCommunication: checked
-                              ? [...(formData.mentorInfo.favoriteCommunication || []), 'virtuelle']
-                              : (formData.mentorInfo.favoriteCommunication || []).filter(val => val !== 'virtuelle')
+                            preferredCommunication: checked
+                              ? [...(formData.mentorInfo.preferredCommunication || []), 'virtual']
+                              : (formData.mentorInfo.preferredCommunication || []).filter(val => val !== 'virtual')
                           }
                         });
                       }}
@@ -489,16 +489,16 @@ const Register = () => {
                     <input
                       type="checkbox"
                       className="form-checkbox text-indigo-600"
-                      checked={formData.mentorInfo.favoriteCommunication?.includes('en personne')}
+                      checked={formData.mentorInfo.preferredCommunication?.includes('in-person')}
                       onChange={e => {
                         const checked = e.target.checked;
                         setFormData({
                           ...formData,
                           mentorInfo: {
                             ...formData.mentorInfo,
-                            favoriteCommunication: checked
-                              ? [...(formData.mentorInfo.favoriteCommunication || []), 'en personne']
-                              : (formData.mentorInfo.favoriteCommunication || []).filter(val => val !== 'en personne')
+                            preferredCommunication: checked
+                              ? [...(formData.mentorInfo.preferredCommunication || []), 'in-person']
+                              : (formData.mentorInfo.preferredCommunication || []).filter(val => val !== 'in-person')
                           }
                         });
                       }}

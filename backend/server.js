@@ -14,6 +14,7 @@ const appointmentRoutes = require('./routes/appointments');
 const internshipRoutes = require('./routes/internships');
 const notificationRoutes = require('./routes/notifications');
 const availabilityRoutes = require('./routes/availability');
+const chatbotRoutes = require('./routes/chatbot');
 
 // Connexion à la base de données
 connectDB();
@@ -61,6 +62,7 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/internships', internshipRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/availability', availabilityRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // Route de test
 app.get('/', (req, res) => {

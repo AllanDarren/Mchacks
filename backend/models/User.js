@@ -63,12 +63,10 @@ const userSchema = new mongoose.Schema({
       current: Boolean
     }],
     
-    // Préférences de communication
-    communicationPreferences: [{
-      type: {
-        type: String,
-        enum: ['messaging', 'virtual', 'in-person']
-      }
+    // Préférences de communication (simple array)
+    preferredCommunication: [{
+      type: String,
+      enum: ['messaging', 'virtual', 'in-person']
     }],
     
     // Disponibilités pour réservations

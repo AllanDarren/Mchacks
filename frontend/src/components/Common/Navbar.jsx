@@ -22,7 +22,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/dashboard" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold text-indigo-600">MentorConnect</span>
+              <span className="text-2xl font-bold text-indigo-600">MentorShip</span>
             </Link>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link
@@ -60,8 +60,7 @@ const Navbar = () => {
                   to="/my-bookings"
                   className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                 >
-                  <FiCalendar className="mr-1" size={18} />
-                  Mes rendez-vous
+                  Disponibilité
                 </Link>
               )}
               {isMentor && (
@@ -77,7 +76,6 @@ const Navbar = () => {
                     to="/availability"
                     className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                   >
-                    <FiCalendar className="mr-1" size={18} />
                     Disponibilité
                   </Link>
                 </>
