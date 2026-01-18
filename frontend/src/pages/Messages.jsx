@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { messagesAPI } from '../services/api';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { messagesAPI, usersAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
@@ -7,11 +8,22 @@ import LoadingSpinner from '../components/Common/LoadingSpinner';
 const Messages = () => {
   const { user } = useAuth();
   const { socket } = useSocket();
+  const [searchParams] = useSearchParams();
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const messagesEndRef = useRef(null);
+
+  // Auto-scroll vers le bas quand de nouveaux messages arrivent
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -21,6 +33,37 @@ const Messages = () => {
     } catch (error) {
       console.error('Erreur:', error);
       setLoading(false);
+    }
+  }, []);
+
+  const openNewConversation = useCallback(async (contactId) => {
+    try {
+      // Récupérer les infos du contact
+      const response = await usersAPI.getProfile(contactId);
+      const contact = response.data;
+      
+      // Créer un objet conversation
+      const newConv = {
+        user: contact,
+        lastMessage: { content: '' },
+        unreadCount: 0
+      };
+      
+      // Sélectionner cette conversation
+      setSelectedConversation(newConv);
+      setMessages([]);
+    } catch (error) {
+      console.error('Erreur lors de l\'ouverture de la conversation:', error);
+    }
+  }, []);
+
+  const selectConversation = useCallback(async (conversation) => {
+    setSelectedConversation(conversation);
+    try {
+      const response = await messagesAPI.getMessages(conversation.user._id);
+      setMessages(response.data);
+    } catch (error) {
+      console.error('Erreur:', error);
     }
   }, []);
 
@@ -41,31 +84,49 @@ const Messages = () => {
     };
   }, [selectedConversation, socket, fetchConversations]);
 
-  const selectConversation = async (conversation) => {
-    setSelectedConversation(conversation);
-    try {
-      const response = await messagesAPI.getMessages(conversation.user._id);
-      setMessages(response.data);
-    } catch (error) {
-      console.error('Erreur:', error);
+  // Gérer l'ouverture automatique d'une conversation depuis l'URL
+  useEffect(() => {
+    const contactId = searchParams.get('contact');
+    if (contactId && !loading) {
+      // Chercher si une conversation existe déjà
+      const existingConv = conversations.find(conv => conv.user._id === contactId);
+      
+      if (existingConv) {
+        // Ouvrir la conversation existante
+        selectConversation(existingConv);
+      } else {
+        // Créer une nouvelle conversation
+        openNewConversation(contactId);
+      }
     }
-  };
+  }, [searchParams, conversations, loading, selectConversation, openNewConversation]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !selectedConversation) return;
 
+    const messageContent = newMessage.trim();
+    setNewMessage(''); // Vider le champ immédiatement pour une meilleure UX
+
     try {
       const response = await messagesAPI.sendMessage({
         receiverId: selectedConversation.user._id,
-        content: newMessage
+        content: messageContent
       });
       
-      setMessages([...messages, response.data]);
+      // Ajouter le message à la liste
+      setMessages(prevMessages => [...prevMessages, response.data]);
+      
+      // Envoyer via socket
       socket.sendMessage(selectedConversation.user._id, response.data);
-      setNewMessage('');
+      
+      // Rafraîchir la liste des conversations pour mettre à jour le dernier message
+      fetchConversations();
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('Erreur lors de l\'envoi du message:', error);
+      // Restaurer le message en cas d'erreur
+      setNewMessage(messageContent);
+      alert('Erreur lors de l\'envoi du message. Veuillez réessayer.');
     }
   };
 
@@ -134,27 +195,44 @@ const Messages = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-              {messages.map((message) => (
-                <div
-                  key={message._id}
-                  className={`mb-4 flex ${
-                    message.senderId._id === user._id ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  <div
-                    className={`max-w-xs px-4 py-2 rounded-lg ${
-                      message.senderId._id === user._id
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-white text-gray-900'
-                    }`}
-                  >
-                    <p>{message.content}</p>
-                    <p className="text-xs mt-1 opacity-75">
-                      {new Date(message.timestamp).toLocaleTimeString()}
-                    </p>
+              {messages.length === 0 ? (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <div className="text-center">
+                    <p className="text-lg font-medium mb-2">Aucun message</p>
+                    <p className="text-sm">Envoyez le premier message pour commencer la conversation !</p>
                   </div>
                 </div>
-              ))}
+              ) : (
+                <>
+                  {messages.map((message, index) => (
+                    <div
+                      key={message._id || index}
+                      className={`mb-4 flex ${
+                        message.senderId._id === user._id ? 'justify-end' : 'justify-start'
+                      }`}
+                    >
+                      <div
+                        className={`max-w-xs px-4 py-2 rounded-lg shadow ${
+                          message.senderId._id === user._id
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-white text-gray-900'
+                        }`}
+                      >
+                        <p className="break-words">{message.content}</p>
+                        <p className={`text-xs mt-1 ${
+                          message.senderId._id === user._id ? 'text-indigo-200' : 'text-gray-500'
+                        }`}>
+                          {new Date(message.timestamp).toLocaleTimeString('fr-FR', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </>
+              )}
             </div>
 
             <form onSubmit={sendMessage} className="p-4 bg-white border-t">
@@ -164,11 +242,17 @@ const Messages = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   placeholder="Écrivez votre message..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                  autoFocus
                 />
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg"
+                  disabled={!newMessage.trim()}
+                  className={`px-6 py-2 font-medium rounded-lg transition-colors ${
+                    newMessage.trim()
+                      ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
                 >
                   Envoyer
                 </button>
