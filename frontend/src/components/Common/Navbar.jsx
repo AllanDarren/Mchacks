@@ -22,7 +22,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/dashboard" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold text-indigo-600">MentorConnect</span>
+              <span className="text-2xl font-bold text-indigo-600">MentorShip</span>
             </Link>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link
