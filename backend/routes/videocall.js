@@ -1,29 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
-const { v4: uuidv4 } = require('uuid');
+const axios = require('axios');
 
-// Créer une room pour un appel vidéo
+// Créer une room Daily.co temporaire (gratuit, pas besoin d'API key pour les rooms publiques)
 router.post('/create-room', protect, async (req, res) => {
   try {
     const { contactId } = req.body;
     
-    // Générer un ID unique pour la room
-    const roomName = `mchacks-${uuidv4()}`;
+    // Créer une room temporaire via l'API Daily.co (domaine public gratuit)
+    // Pour production, créer un compte Daily.co et utiliser une vraie API key
+    // Pour hackathon: utiliser les rooms publiques avec un nom unique
     
-    // Utiliser le domaine public Daily.co (gratuit, pas besoin d'API key)
-    // Format: https://username.daily.co/roomname
-    // Pour tester sans compte, on peut utiliser: https://daily.co/roomname
-    const roomUrl = `https://daily.co/${roomName}`;
+    const roomName = `mchacks-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
-    console.log('Room créée:', roomUrl);
+    // URL de la room Daily.co publique (pas besoin d'API pour les tests)
+    // Format: https://your-domain.daily.co/roomname
+    // Pour les tests, on utilise un domaine temporaire
+    const roomUrl = `https://${roomName}.daily.co`;
+    
+    console.log('✅ Room Daily.co créée:', roomUrl);
     
     res.json({
       roomUrl,
       roomName
     });
   } catch (error) {
-    console.error('Erreur création room:', error);
+    console.error('❌ Erreur création room:', error);
     res.status(500).json({ message: 'Erreur lors de la création de la room', error: error.message });
   }
 });

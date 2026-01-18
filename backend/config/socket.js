@@ -33,11 +33,11 @@ const initializeSocket = (io) => {
       });
     });
 
-    // Jitsi - Invitation d'appel vidéo
-    socket.on('jitsi-call-invite', ({ to, roomName, callerName }) => {
-      console.log(`📞 Invitation Jitsi de ${callerName} vers ${to} - Room: ${roomName}`);
-      io.to(to).emit('jitsi-call-invite', {
-        roomName: roomName,
+    // Daily.co - Invitation d'appel vidéo
+    socket.on('daily-call-invite', ({ to, roomUrl, callerName }) => {
+      console.log(`📞 Invitation Daily.co de ${callerName} vers ${to} - Room: ${roomUrl}`);
+      io.to(to).emit('daily-call-invite', {
+        roomUrl: roomUrl,
         callerName: callerName
       });
     });

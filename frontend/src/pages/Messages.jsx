@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { messagesAPI, usersAPI } from '../services/api';
+import { messagesAPI, usersAPI, videocallAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
-import JitsiVideoCall from '../components/VideoCall/JitsiVideoCall';
+import DailyVideoCall from '../components/VideoCall/DailyVideoCall';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -17,9 +17,9 @@ const Messages = () => {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
   
-  // État pour les appels vidéo Jitsi
-  const [callRoomName, setCallRoomName] = useState(null);
-  const [incomingCall, setIncomingCall] = useState(null); // {callerName, roomName}
+  // État pour les appels vidéo Daily.co
+  const [callRoomUrl, setCallRoomUrl] = useState(null);
+  const [incomingCall, setIncomingCall] = useState(null); // {callerName, roomUrl}
 
   // Auto-scroll vers le bas quand de nouveaux messages arrivent
   const scrollToBottom = () => {
@@ -30,31 +30,30 @@ const Messages = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Écouter les appels entrants Jitsi
+  // Écouter les appels entrants Daily.co
   useEffect(() => {
     if (!socket.socket) return;
 
     const handleIncomingCall = (data) => {
-      console.log('📞 Appel Jitsi entrant:', data);
+      console.log('📞 Appel Daily.co entrant:', data);
       
-      // Ne pas afficher si déjà en appel
-      if (callRoomName) {
+      if (callRoomUrl) {
         console.log('Déjà en appel, ignoré');
         return;
       }
       
       setIncomingCall({
         callerName: data.callerName || 'Utilisateur',
-        roomName: data.roomName
+        roomUrl: data.roomUrl
       });
     };
 
-    socket.socket.on('jitsi-call-invite', handleIncomingCall);
+    socket.socket.on('daily-call-invite', handleIncomingCall);
 
     return () => {
-      socket.socket.off('jitsi-call-invite', handleIncomingCall);
+      socket.socket.off('daily-call-invite', handleIncomingCall);
     };
-  }, [socket, callRoomName]);
+  }, [socket, callRoomUrl]);
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -161,43 +160,51 @@ const Messages = () => {
     }
   };
 
-  const startCall = () => {
+  const startCall = async () => {
     if (!selectedConversation) return;
     
-    console.log('🎥 Démarrage appel Jitsi vers:', selectedConversation.user._id);
-    
-    // Créer un nom de room unique
-    const roomName = `mchacks-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
-    // Rejoindre la room immédiatement
-    setCallRoomName(roomName);
-    
-    // Envoyer l'invitation via socket
-    socket.socket.emit('jitsi-call-invite', {
-      to: selectedConversation.user._id,
-      roomName: roomName,
-      callerName: `${user.firstName} ${user.lastName}`
-    });
-    
-    console.log('📤 Invitation Jitsi envoyée - Room:', roomName);
+    try {
+      console.log('🎥 Création room Daily.co pour:', selectedConversation.user._id);
+      
+      // Créer une room via l'API backend
+      const response = await videocallAPI.createRoom(selectedConversation.user._id);
+      const { roomUrl } = response.data;
+      
+      console.log('✅ Room créée:', roomUrl);
+      
+      // Rejoindre la room
+      setCallRoomUrl(roomUrl);
+      
+      // Envoyer l'invitation
+      socket.socket.emit('daily-call-invite', {
+        to: selectedConversation.user._id,
+        roomUrl: roomUrl,
+        callerName: `${user.firstName} ${user.lastName}`
+      });
+      
+      console.log('📤 Invitation envoyée');
+    } catch (error) {
+      console.error('❌ Erreur création room:', error);
+      alert('Impossible de démarrer l\'appel vidéo');
+    }
   };
 
   const acceptIncomingCall = () => {
-    console.log('✅ Acceptation de l\'appel de:', incomingCall?.callerName);
+    console.log('✅ Acceptation appel:', incomingCall?.callerName);
     if (incomingCall) {
-      setCallRoomName(incomingCall.roomName);
+      setCallRoomUrl(incomingCall.roomUrl);
       setIncomingCall(null);
     }
   };
 
   const rejectIncomingCall = () => {
-    console.log('❌ Refus de l\'appel');
+    console.log('❌ Refus appel');
     setIncomingCall(null);
   };
 
   const closeCall = () => {
-    console.log('📞 Fermeture de l\'appel vidéo');
-    setCallRoomName(null);
+    console.log('📞 Fermeture appel');
+    setCallRoomUrl(null);
   };
 
   if (loading) {
@@ -349,11 +356,10 @@ const Messages = () => {
         )}
       </div>
 
-      {/* Composant d'appel vidéo Jitsi */}
-      {callRoomName && (
-        <JitsiVideoCall
-          roomName={callRoomName}
-          displayName={`${user.firstName} ${user.lastName}`}
+      {/* Appel vidéo Daily.co intégré */}
+      {callRoomUrl && (
+        <DailyVideoCall
+          roomUrl={callRoomUrl}
           onLeave={closeCall}
         />
       )}
