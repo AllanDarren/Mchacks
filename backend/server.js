@@ -27,8 +27,21 @@ const io = socketIo(server, {
 });
 
 // Middlewares
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URL + '/',
+  'http://localhost:3000',
+  'http://localhost:3000/'
+];
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS: ' + origin));
+  },
   credentials: true
 }));
 app.use(express.json());

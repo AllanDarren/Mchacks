@@ -32,6 +32,7 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showOtherCompany, setShowOtherCompany] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -218,19 +219,8 @@ const Register = () => {
                 <input
                   type="password"
                   name="confirmPassword"
-                  placeholder="Répétez votre mot de passe"h={6}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Confirmer le mot de passe</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
                   required
+                  placeholder="Répétez votre mot de passe"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -334,18 +324,84 @@ const Register = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Entreprise</label>
-                <input
-                  type="text"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Entreprise *</label>
+                <select
+                  name="company"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   value={formData.mentorInfo.company}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setFormData({
                       ...formData,
                       mentorInfo: { ...formData.mentorInfo, company: e.target.value }
-                    })
-                  }
-                />
+                    });
+                    setShowOtherCompany(e.target.value === 'Autre');
+                  }}
+                  required
+                >
+                  <option value="">Sélectionnez une entreprise</option>
+                  <option value="Holoray">Holoray</option>
+                  <option value="Athena AI">Athena AI</option>
+                  <option value="Gumloop">Gumloop</option>
+                  <option value="Banque Nationale">Banque Nationale</option>
+                  <option value="Bassilchat">Bassilchat</option>
+                  <option value="Dobson Centre">Dobson Centre</option>
+                  <option value="Desjardins">Desjardins</option>
+                  <option value="Finitech">Finitech</option>
+                  <option value="Backboard.io">Backboard.io</option>
+                  <option value="Sourcebot">Sourcebot</option>
+                  <option value="Nova">Nova</option>
+                  <option value="Tail'ed">Tail'ed</option>
+                  <option value="Aéum SSMU">Aéum SSMU</option>
+                  <option value="Pure">Pure</option>
+                  <option value="Google">Google</option>
+                  <option value="Microsoft">Microsoft</option>
+                  <option value="Amazon">Amazon</option>
+                  <option value="Meta">Meta</option>
+                  <option value="Apple">Apple</option>
+                  <option value="IBM">IBM</option>
+                  <option value="Salesforce">Salesforce</option>
+                  <option value="Shopify">Shopify</option>
+                  <option value="Deloitte">Deloitte</option>
+                  <option value="PwC">PwC</option>
+                  <option value="EY">EY</option>
+                  <option value="KPMG">KPMG</option>
+                  <option value="Accenture">Accenture</option>
+                  <option value="Capgemini">Capgemini</option>
+                  <option value="CGI">CGI</option>
+                  <option value="Ubisoft">Ubisoft</option>
+                  <option value="SAP">SAP</option>
+                  <option value="Oracle">Oracle</option>
+                  <option value="SNC-Lavalin">SNC-Lavalin</option>
+                  <option value="Air Canada">Air Canada</option>
+                  <option value="Bombardier">Bombardier</option>
+                  <option value="Bell">Bell</option>
+                  <option value="Rogers">Rogers</option>
+                  <option value="Telus">Telus</option>
+                  <option value="National Bank">National Bank</option>
+                  <option value="TD">TD</option>
+                  <option value="RBC">RBC</option>
+                  <option value="Scotiabank">Scotiabank</option>
+                  <option value="BMO">BMO</option>
+                  <option value="L'Oréal">L'Oréal</option>
+                  <option value="Danone">Danone</option>
+                  <option value="Nestlé">Nestlé</option>
+                  <option value="PepsiCo">PepsiCo</option>
+                  <option value="Unilever">Unilever</option>
+                  <option value="Morgan Stanley">Morgan Stanley</option>
+                  <option value="Autre">Autre</option>
+                </select>
+                {showOtherCompany && (
+                  <input
+                    type="text"
+                    className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Nom de l'entreprise"
+                    value={formData.mentorInfo.company !== 'Autre' ? formData.mentorInfo.company : ''}
+                    onChange={e => setFormData({
+                      ...formData,
+                      mentorInfo: { ...formData.mentorInfo, company: e.target.value }
+                    })}
+                  />
+                )}
               </div>
 
               <div>
@@ -388,6 +444,72 @@ const Register = () => {
                     })
                   }
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Moyens de communication favoris *</label>
+                <div className="flex flex-col gap-2">
+                  <label className="inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      className="form-checkbox text-indigo-600"
+                      checked={formData.mentorInfo.favoriteCommunication?.includes('messagerie')}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setFormData({
+                          ...formData,
+                          mentorInfo: {
+                            ...formData.mentorInfo,
+                            favoriteCommunication: checked
+                              ? [...(formData.mentorInfo.favoriteCommunication || []), 'messagerie']
+                              : (formData.mentorInfo.favoriteCommunication || []).filter(val => val !== 'messagerie')
+                          }
+                        });
+                      }}
+                    />
+                    <span className="ml-2">Messagerie</span>
+                  </label>
+                  <label className="inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      className="form-checkbox text-indigo-600"
+                      checked={formData.mentorInfo.favoriteCommunication?.includes('virtuelle')}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setFormData({
+                          ...formData,
+                          mentorInfo: {
+                            ...formData.mentorInfo,
+                            favoriteCommunication: checked
+                              ? [...(formData.mentorInfo.favoriteCommunication || []), 'virtuelle']
+                              : (formData.mentorInfo.favoriteCommunication || []).filter(val => val !== 'virtuelle')
+                          }
+                        });
+                      }}
+                    />
+                    <span className="ml-2">Rencontre virtuelle</span>
+                  </label>
+                  <label className="inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      className="form-checkbox text-indigo-600"
+                      checked={formData.mentorInfo.favoriteCommunication?.includes('en personne')}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setFormData({
+                          ...formData,
+                          mentorInfo: {
+                            ...formData.mentorInfo,
+                            favoriteCommunication: checked
+                              ? [...(formData.mentorInfo.favoriteCommunication || []), 'en personne']
+                              : (formData.mentorInfo.favoriteCommunication || []).filter(val => val !== 'en personne')
+                          }
+                        });
+                      }}
+                    />
+                    <span className="ml-2">En personne</span>
+                  </label>
+                </div>
               </div>
 
               <div className="flex gap-4">
