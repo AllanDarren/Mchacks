@@ -70,11 +70,11 @@ exports.searchMentors = async (req, res) => {
     }
 
     if (industry) {
-      query['mentorInfo.industry'] = industry;
+      query['mentorInfo.industry'] = { $regex: industry, $options: 'i' };
     }
 
     if (expertise) {
-      query['mentorInfo.expertise'] = { $in: [expertise] };
+      query['mentorInfo.expertise'] = { $elemMatch: { $regex: expertise, $options: 'i' } };
     }
 
     if (communicationType) {
