@@ -269,7 +269,7 @@ const Register = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Objectifs professionnels</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1"> Professionnel goals</label>
                 <textarea
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   rows="3"
@@ -289,14 +289,14 @@ const Register = () => {
                   onClick={() => setStep(1)}
                   className="flex-1 py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg"
                 >
-                  Retour
+                  Return
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
                   className="flex-1 py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg disabled:opacity-50"
                 >
-                  {loading ? 'Inscription...' : 'S\'inscrire'}
+                  {loading ? 'Inscription...' : 'Sign up'}
                 </button>
               </div>
             </div>

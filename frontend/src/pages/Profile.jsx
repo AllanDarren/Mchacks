@@ -235,7 +235,7 @@ const Profile = () => {
                         }
                         rows="4"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                        placeholder="Décrivez vos objectifs professionnels et académiques..."
+                        placeholder="Describe your professional goals..."
                       />
                     </div>
                   </>
