@@ -78,7 +78,7 @@ exports.searchMentors = async (req, res) => {
     }
 
     if (communicationType) {
-      query['mentorInfo.communicationPreferences.type'] = communicationType;
+      query['mentorInfo.preferredCommunication'] = communicationType;
     }
 
     if (offersInternship === 'true') {

@@ -77,7 +77,6 @@ const Navbar = () => {
                     to="/availability"
                     className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                   >
-                    <FiCalendar className="mr-1" size={18} />
                     Disponibilité
                   </Link>
                 </>
