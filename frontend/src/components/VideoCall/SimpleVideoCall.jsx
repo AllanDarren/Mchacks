@@ -6,7 +6,8 @@ const SimpleVideoCall = ({
   contactId,
   contactName,
   onLeave,
-  isIncoming = false
+  isIncoming = false,
+  initialOffer = null // Nouvelle prop: l'offre WebRTC déjà reçue
 }) => {
   const { socket } = useSocket();
   const { user } = useAuth();
@@ -20,12 +21,28 @@ const SimpleVideoCall = ({
   const remoteVideoRef = useRef(null);
   const peerConnectionRef = useRef(null);
 
-  // Configuration ICE servers (STUN gratuit de Google)
+  // Configuration ICE servers (STUN + TURN pour traverser les NAT)
   const configuration = {
     iceServers: [
       { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun1.l.google.com:19302' }
-    ]
+      { urls: 'stun:stun1.l.google.com:19302' },
+      {
+        urls: 'turn:openrelay.metered.ca:80',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      },
+      {
+        urls: 'turn:openrelay.metered.ca:443',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      },
+      {
+        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      }
+    ],
+    iceCandidatePoolSize: 10
   };
 
   useEffect(() => {
@@ -76,23 +93,37 @@ const SimpleVideoCall = ({
       // Gérer les candidats ICE
       peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-          console.log('🧊 Envoi ICE candidate');
+          console.log('🧊 Envoi ICE candidate:', event.candidate.type, event.candidate.address);
           socket.socket.emit('ice-candidate', {
             to: contactId,
             candidate: event.candidate
           });
+        } else {
+          console.log('✅ Tous les ICE candidates envoyés');
         }
       };
 
       // Vérifier l'état de la connexion
       peerConnection.onconnectionstatechange = () => {
-        console.log('État connexion:', peerConnection.connectionState);
+        console.log('🔗 État connexion:', peerConnection.connectionState);
         if (peerConnection.connectionState === 'connected') {
           setCallState('connected');
+          console.log('✅ Connexion WebRTC établie !');
         } else if (peerConnection.connectionState === 'disconnected' || 
                    peerConnection.connectionState === 'failed') {
           setCallState('disconnected');
+          console.log('❌ Connexion WebRTC échouée');
         }
+      };
+
+      // État ICE
+      peerConnection.oniceconnectionstatechange = () => {
+        console.log('🧊 État ICE:', peerConnection.iceConnectionState);
+      };
+
+      // État de collecte ICE
+      peerConnection.onicegatheringstatechange = () => {
+        console.log('📡 État collecte ICE:', peerConnection.iceGatheringState);
       };
 
       // Si on initie l'appel, créer et envoyer l'offre
@@ -106,6 +137,24 @@ const SimpleVideoCall = ({
           offer: offer,
           callerName: `${user.firstName} ${user.lastName}`
         });
+      } else if (initialOffer) {
+        // Si on reçoit un appel et qu'on a déjà l'offre, la traiter immédiatement
+        console.log('📥 Traitement de l\'offre initiale...');
+        try {
+          await peerConnection.setRemoteDescription(new RTCSessionDescription(initialOffer));
+          console.log('✅ Remote description définie');
+          
+          const answer = await peerConnection.createAnswer();
+          await peerConnection.setLocalDescription(answer);
+          
+          socket.socket.emit('webrtc-answer', {
+            to: contactId,
+            answer: answer
+          });
+          console.log('📤 Réponse envoyée');
+        } catch (error) {
+          console.error('❌ Erreur traitement offre initiale:', error);
+        }
       }
 
       // Écouter les événements WebRTC
@@ -125,9 +174,10 @@ const SimpleVideoCall = ({
   const setupWebRTCListeners = (peerConnection) => {
     // Recevoir une offre
     socket.socket.on('webrtc-offer', async (data) => {
-      console.log('📥 Offre reçue');
+      console.log('📥 Offre reçue de:', data.from);
       try {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+        console.log('✅ Remote description définie');
         
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
@@ -136,9 +186,9 @@ const SimpleVideoCall = ({
           to: data.from,
           answer: answer
         });
-        console.log('📤 Réponse envoyée');
+        console.log('📤 Réponse envoyée à:', data.from);
       } catch (error) {
-        console.error('Erreur traitement offre:', error);
+        console.error('❌ Erreur traitement offre:', error);
       }
     });
 
@@ -147,8 +197,9 @@ const SimpleVideoCall = ({
       console.log('📥 Réponse reçue');
       try {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        console.log('✅ Réponse acceptée');
       } catch (error) {
-        console.error('Erreur traitement réponse:', error);
+        console.error('❌ Erreur traitement réponse:', error);
       }
     });
 
@@ -158,9 +209,10 @@ const SimpleVideoCall = ({
       try {
         if (data.candidate) {
           await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+          console.log('✅ ICE candidate ajouté');
         }
       } catch (error) {
-        console.error('Erreur ajout ICE candidate:', error);
+        console.error('❌ Erreur ajout ICE candidate:', error);
       }
     });
 

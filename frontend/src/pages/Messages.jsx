@@ -19,10 +19,11 @@ const Messages = () => {
   
   // État pour les appels vidéo WebRTC
   const [isInCall, setIsInCall] = useState(false);
-  const [incomingCall, setIncomingCall] = useState(null);
+  const [incomingCall, setIncomingCall] = useState(null); // Stocke {from, callerName, offer}
   const [callContactId, setCallContactId] = useState(null);
   const [callContactName, setCallContactName] = useState(null);
   const [isIncomingCall, setIsIncomingCall] = useState(false);
+  const [pendingOffer, setPendingOffer] = useState(null); // Nouvelle: stocke l'offre WebRTC
 
   // Auto-scroll vers le bas quand de nouveaux messages arrivent
   const scrollToBottom = () => {
@@ -46,10 +47,12 @@ const Messages = () => {
         return;
       }
       
+      // Stocker l'offre ET les infos de l'appelant
       setIncomingCall({
         from: data.from,
         callerName: data.callerName || 'Utilisateur'
       });
+      setPendingOffer(data.offer); // Sauvegarder l'offre WebRTC
     };
 
     socket.socket.on('webrtc-offer', handleIncomingCall);
@@ -183,12 +186,14 @@ const Messages = () => {
       setCallContactName(incomingCall.callerName);
       setIsIncomingCall(true);
       setIncomingCall(null);
+      // pendingOffer est déjà dans le state, sera passé à SimpleVideoCall
     }
   };
 
   const rejectIncomingCall = () => {
     console.log('❌ Refus de l\'appel');
     setIncomingCall(null);
+    setPendingOffer(null);
   };
 
   const closeCall = () => {
@@ -197,6 +202,7 @@ const Messages = () => {
     setCallContactId(null);
     setCallContactName(null);
     setIsIncomingCall(false);
+    setPendingOffer(null);
   };
 
   if (loading) {
@@ -355,6 +361,7 @@ const Messages = () => {
           contactName={callContactName}
           onLeave={closeCall}
           isIncoming={isIncomingCall}
+          initialOffer={pendingOffer}
         />
       )}
 
